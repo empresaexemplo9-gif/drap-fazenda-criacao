@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Plus } from 'lucide-react';
 import { useEstado, salvar, salvarVarios, novoId } from '@/lib/store';
 import { useHoje, useIndices } from '@/lib/hooks';
@@ -17,12 +17,17 @@ import { moduloAtivo } from '@/lib/domain/modulos';
 import type { LeituraCocho } from '@/lib/domain/types';
 import { PageHeader, Em, Card, Tabs, Tabela, Badge, Field, Input, Select, Modal, StatGrid, Stat, Aviso, Empty, cx } from '@/components/ui';
 import { BarrasH, Linha } from '@/components/graficos';
+import { VenderSegurar, Terminacao } from '@/components/simuladores-corte';
 
-type Aba = 'desempenho' | 'confinamento' | 'reposicao' | 'vendas' | 'indicadores';
+type Aba = 'desempenho' | 'confinamento' | 'reposicao' | 'vendas' | 'decisao' | 'indicadores';
 
 export default function CortePage() {
   const e = useEstado();
   const [aba, setAba] = useState<Aba>('desempenho');
+  useEffect(() => {
+    const a = new URLSearchParams(window.location.search).get('aba') as Aba | null;
+    if (a) setAba(a);
+  }, []);
   if (!moduloAtivo(e.modulos, 'corte')) return <Empty>Módulo Corte não contratado. Ative em <Link href="/config/" className="text-earth underline">Configurações</Link>.</Empty>;
   return (
     <>
@@ -30,12 +35,13 @@ export default function CortePage() {
         sub="Ganho de peso com histórico usável, confinamento por cocho, reposição comparada por fornecedor, venda por frigorífico e os indicadores que dizem se a fazenda está dando lucro." />
       <Tabs<Aba> ativa={aba} onChange={setAba} abas={[
         { id: 'desempenho', label: 'Ganho de peso' }, { id: 'confinamento', label: 'Confinamento' }, { id: 'reposicao', label: 'Reposição' },
-        { id: 'vendas', label: 'Vendas e frigoríficos' }, { id: 'indicadores', label: 'Indicadores' },
+        { id: 'vendas', label: 'Vendas e frigoríficos' }, { id: 'decisao', label: 'Vender × segurar' }, { id: 'indicadores', label: 'Indicadores' },
       ]} />
       {aba === 'desempenho' && <Desempenho />}
       {aba === 'confinamento' && <Confinamento />}
       {aba === 'reposicao' && <Reposicao />}
       {aba === 'vendas' && <Vendas />}
+      {aba === 'decisao' && <Decisao />}
       {aba === 'indicadores' && <Indicadores />}
     </>
   );
@@ -337,6 +343,22 @@ function Indicadores() {
         <Stat label="Lucro por hectare" value={area ? brl(d.resultado / area) : '—'} />
       </StatGrid>
       <Aviso tone="earth" titulo="Rastreabilidade premium">Cada animal tem campo de SISBOV, histórico sanitário com partida e GTA de saída. Protocolos como SISBOV, Carne Carbono Neutro e programas de qualidade de frigorífico usam esses dados. A exportação no formato de cada programa está no roteiro.</Aviso>
+    </div>
+  );
+}
+
+function Decisao() {
+  const e = useEstado();
+  const hoje = useHoje();
+  const boi = e.cotacoes.filter((c) => c.indicador === 'boi_gordo').sort((a, b) => a.data.localeCompare(b.data)).pop()?.valor ?? 300;
+  const [qual, setQual] = useState<'segurar' | 'terminacao'>('segurar');
+  return (
+    <div className="space-y-5">
+      <div className="flex gap-2">
+        <button className={cx('rounded-full border px-3 py-1 text-[13px] font-medium', qual === 'segurar' ? 'border-ink bg-ink text-paper' : 'border-rule text-muted')} onClick={() => setQual('segurar')}>Vender agora ou segurar</button>
+        <button className={cx('rounded-full border px-3 py-1 text-[13px] font-medium', qual === 'terminacao' ? 'border-ink bg-ink text-paper' : 'border-rule text-muted')} onClick={() => setQual('terminacao')}>Pasto × semiconfinamento × confinamento</button>
+      </div>
+      {qual === 'segurar' ? <VenderSegurar boi={boi} hoje={hoje} /> : <Terminacao boi={boi} />}
     </div>
   );
 }

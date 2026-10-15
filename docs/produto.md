@@ -61,10 +61,25 @@ Documento para a revisão dos sócios. Ele cruza cada dor levantada com o que j�
 | Sêmen e embriões | Botijão, caneca, doses, custo, validade e baixa da dose na inseminação | ✅ |
 | Marketing e confiança na venda | Catálogo com DEPs e genealogia e **ficha do animal com impressão digital SHA-256** do histórico | 🟡 vitrine pública on-line depende do servidor |
 
-## 5. Arquitetura modular
+## 5. Arquitetura modular: cada produtor leva só o que faz
 
-- **Núcleo DRAP Pecuária** (obrigatório): tudo da seção 1.
-- **Módulos plugáveis** com preço próprio, ligados e desligados em *Configurações*. Menu, painel, lotes e custos respeitam o que está contratado.
+A maioria dos produtores trabalha com **uma atividade só** (corte, leite ou genética). Outros combinam duas ou as três. Por isso a plataforma é separada por módulo desde o primeiro acesso:
+
+- **Primeiro acesso:** "Como é a sua operação?". O produtor marca Corte, Leite e/ou Genética (sete combinações possíveis) e começa com a demo daquele perfil ou com a fazenda vazia.
+- **Núcleo DRAP Pecuária** (obrigatório): tudo da seção 1, **recortado pelo perfil**:
+
+  | No núcleo | Só corte | Só leite | Só genética |
+  |---|---|---|---|
+  | Lotes e fases | cria, recria, engorda, confinamento | lactação, secas, bezerras | doadoras, touros, tourinhos em prova |
+  | Contas de receita | boi gordo, bezerro | venda de leite | reprodutores, sêmen e embriões |
+  | Custo de produção | custo da @ | custo do litro | custo do plantel PO por cabeça/mês |
+  | Mercado | boi, vaca, bezerro, milho | leite, milho | boi e bezerro (referência), milho |
+  | Painel | cartão Corte | cartão Leite | cartão Genética |
+  | DRE | resultado da fazenda | resultado da fazenda | resultado da fazenda |
+
+  Com duas ou três atividades, a DRE ganha uma coluna por atividade e os custos comuns são rateados entre elas por UA·dia.
+- **Módulos plugáveis** com preço próprio, ligados e desligados em *Configurações*. Desligar esconde as telas e os lotes do módulo sem apagar dados. A fazenda nunca fica sem pelo menos uma atividade.
+- **O que é de um módulo fica no módulo:** "vender × segurar" e "pasto × confinamento" são do Corte; qualidade e tabela do laticínio são do Leite; DEPs e acasalamento são da Genética.
 - **Camada de inteligência:** o Painel "o que precisa da sua atenção hoje", as sugestões do calendário (vacina, carência, parto, secagem, GTA, ruptura de estoque, pagamento), os simuladores e os comparativos.
 - **Reaproveitamento do DRAP Fazenda:** paleta, tipografia, componentes, o método do livro-razão (plano em 3 níveis, título pendente até `pago_em`, Posição) e a infraestrutura (Next.js, Vercel, Supabase).
 

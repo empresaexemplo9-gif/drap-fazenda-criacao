@@ -9,7 +9,7 @@ import { previsaoRuptura, consumoSalEsperado } from '@/lib/domain/estoque';
 import { pesoAtual, uaDe, ativos } from '@/lib/domain/rebanho';
 import { CONTA_FORNECEDORES } from '@/lib/domain/livro-razao';
 import { safraDe } from '@/lib/datas';
-import { useIndices } from '@/lib/hooks';
+import { useIndices, usePerfil } from '@/lib/hooks';
 import { ROT_INSUMO, opcoes } from '@/lib/rotulos';
 import type { CategoriaInsumo, Insumo, MovEstoque } from '@/lib/domain/types';
 import { PageHeader, Em, Card, Tabela, Badge, Field, Input, Select, Modal, StatGrid, Stat, Barra, Aviso } from '@/components/ui';
@@ -109,6 +109,7 @@ export default function EstoquePage() {
 
 function MovModal({ insumo, tipo, onFechar }: { insumo: Insumo; tipo: MovEstoque['tipo']; onFechar: () => void }) {
   const e = useEstado();
+  const perfil = usePerfil();
   const hoje = useHoje();
   const [f, setF] = useState({ data: hoje, qtd: '', vu: String(insumo.custoMedio || ''), nota: '', destino: '', loteId: '', fornecedor: '', lancar: true, vencimento: '' });
   const n = (v: string) => Number(v.replace(/\./g, '').replace(',', '.')) || 0;
@@ -138,7 +139,7 @@ function MovModal({ insumo, tipo, onFechar }: { insumo: Insumo; tipo: MovEstoque
           <Field label="Vencimento"><Input type="date" value={f.vencimento} onChange={(ev) => setF({ ...f, vencimento: ev.target.value })} /></Field>
           <label className="col-span-2 flex items-center gap-2 text-[13px] text-muted"><input type="checkbox" checked={f.lancar} onChange={(ev) => setF({ ...f, lancar: ev.target.checked })} /> Lançar no livro-razão como despesa a prazo</label>
         </> : <>
-          <Field label="Lote (custo direto)"><Select value={f.loteId} onChange={(ev) => setF({ ...f, loteId: ev.target.value })} vazio="—" opcoes={e.lotes.map((l) => ({ value: l.id, label: l.nome }))} /></Field>
+          <Field label="Lote (custo direto)"><Select value={f.loteId} onChange={(ev) => setF({ ...f, loteId: ev.target.value })} vazio="—" opcoes={perfil.lotes.map((l) => ({ value: l.id, label: l.nome }))} /></Field>
           <Field label="Destino"><Input value={f.destino} onChange={(ev) => setF({ ...f, destino: ev.target.value })} placeholder="cocho, trator, curral…" /></Field>
         </>}
       </div>

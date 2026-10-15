@@ -8,11 +8,12 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useEstado, salvar, novoId } from '@/lib/store';
-import { useHoje } from '@/lib/hooks';
+import { useHoje, usePerfil } from '@/lib/hooks';
 import { brl } from '@/lib/format';
 import { safraDe } from '@/lib/datas';
 import { validarLancamento, CONTA_BANCO, CONTA_CAIXA, CONTA_CLIENTES, CONTA_FORNECEDORES, nivel, fornecedores } from '@/lib/domain/livro-razao';
 import { ROT_ATIVIDADE } from '@/lib/rotulos';
+import { contaVisivel } from '@/lib/domain/modulos';
 import type { Atividade, FormaPgto, Lancamento } from '@/lib/domain/types';
 import { Field, Input, Select, Modal, cx } from './ui';
 
@@ -37,13 +38,15 @@ export function LancamentoForm({ aberto, onFechar, inicial }: { aberto: boolean;
 
   useEffect(() => {
     if (!aberto) return;
-    setF({ data: hoje, atividade: 'corte', formaPgto: 'A PAGAR', debito: '5.1.01', ...inicial });
+    setF({ data: hoje, atividade: perfil.atividades.length === 1 ? perfil.atividades[0] : 'geral', formaPgto: 'A PAGAR', debito: '5.1.01', ...inicial });
     setValorTxt(inicial?.valor ? String(inicial.valor).replace('.', ',') : '');
     setModelo(inicial?.id ? 'livre' : 'despesa_prazo');
     setErros({});
   }, [aberto]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const analiticas = e.contas.filter((c) => nivel(c.codigo) === 3);
+  const perfil = usePerfil();
+  const analiticas = e.contas.filter((c) => nivel(c.codigo) === 3 && contaVisivel(c.codigo, e.modulos));
+  const atividadesOp: Atividade[] = [...perfil.atividades, 'geral'];
   const despesas = analiticas.filter((c) => c.natureza === 'despesa');
   const receitas = analiticas.filter((c) => c.natureza === 'receita');
   const opc = (cs: typeof analiticas) => cs.map((c) => ({ value: c.codigo, label: `${c.codigo} · ${c.nome}` }));
@@ -63,7 +66,7 @@ export function LancamentoForm({ aberto, onFechar, inicial }: { aberto: boolean;
   function trocarModelo(m: Modelo) {
     setModelo(m);
     if (m.startsWith('despesa')) setF((x) => ({ ...x, debito: despesas.some((c) => c.codigo === x.debito) ? x.debito : '5.1.01', formaPgto: m === 'despesa_prazo' ? 'A PAGAR' : 'PIX' }));
-    if (m.startsWith('receita')) setF((x) => ({ ...x, credito: receitas.some((c) => c.codigo === x.credito) ? x.credito : '4.1.01', formaPgto: m === 'receita_prazo' ? 'A PAGAR' : 'TRANSFER' }));
+    if (m.startsWith('receita')) setF((x) => ({ ...x, credito: receitas.some((c) => c.codigo === x.credito) ? x.credito : receitas[0]?.codigo, formaPgto: m === 'receita_prazo' ? 'A PAGAR' : 'TRANSFER' }));
   }
 
   function gravar() {
@@ -118,7 +121,7 @@ export function LancamentoForm({ aberto, onFechar, inicial }: { aberto: boolean;
           </>
         )}
 
-        <Field label="Atividade" dica="Geral é rateado no custo"><Select value={f.atividade ?? 'geral'} onChange={(ev) => setF({ ...f, atividade: ev.target.value as Atividade, loteId: undefined })} opcoes={(Object.keys(ROT_ATIVIDADE) as Atividade[]).map((a) => ({ value: a, label: ROT_ATIVIDADE[a] }))} /></Field>
+        <Field label="Atividade" dica="Geral é rateado no custo"><Select value={f.atividade ?? 'geral'} onChange={(ev) => setF({ ...f, atividade: ev.target.value as Atividade, loteId: undefined })} opcoes={atividadesOp.map((a) => ({ value: a, label: ROT_ATIVIDADE[a] }))} /></Field>
         <Field label="Lote (custo direto)"><Select value={f.loteId ?? ''} onChange={(ev) => setF({ ...f, loteId: ev.target.value || undefined })} vazio="— rateio —" opcoes={lotes.map((l) => ({ value: l.id, label: l.nome }))} /></Field>
         <Field label="Forma de pagamento"><Select value={f.formaPgto ?? ''} onChange={(ev) => setF({ ...f, formaPgto: (ev.target.value || undefined) as FormaPgto })} vazio="—" opcoes={(['A PAGAR', 'BOLETO', 'TRANSFER', 'PIX', 'DINHEIRO', 'CARTAO', 'CREDITO RURAL'] as FormaPgto[]).map((x) => ({ value: x, label: x }))} /></Field>
         <Field label="Fornecedor / cliente" className="col-span-2"><Input list="lanc-forn" value={f.fornecedor ?? ''} onChange={(ev) => setF({ ...f, fornecedor: ev.target.value })} /></Field>

@@ -4,12 +4,11 @@ import Link from 'next/link';
 import { useMemo, useState, useEffect } from 'react';
 import { Plus, Search, ArrowUpRight, ArrowRightLeft } from 'lucide-react';
 import { useEstado, salvar, atualizar, novoId } from '@/lib/store';
-import { useHoje, useIndices } from '@/lib/hooks';
+import { useHoje, useIndices, usePerfil } from '@/lib/hooks';
 import { num, isoToBrDate } from '@/lib/format';
 import { idadeMeses, addDias } from '@/lib/datas';
 import { categoriaDe, ROTULO_CATEGORIA, pesoAtual, gmd, uaDe, conciliarCabecas, carenciasAtivas, animaisDoLote, gmdGrupo } from '@/lib/domain/rebanho';
 import { ROT_ATIVIDADE, ROT_FASE, ROT_STATUS, opcoes } from '@/lib/rotulos';
-import { moduloAtivo } from '@/lib/domain/modulos';
 import type { Atividade, Fase, Lote, Sexo, StatusAnimal } from '@/lib/domain/types';
 import { NovoAnimal, MoverLote } from '@/components/rebanho-forms';
 import { PageHeader, Em, Card, Tabs, Tabela, Badge, Field, Input, Select, Modal, Empty, StatGrid, Stat, Aviso } from '@/components/ui';
@@ -40,12 +39,13 @@ export default function RebanhoPage() {
   }, []);
 
   const carencia = useMemo(() => new Set(carenciasAtivas(e.sanidade, hoje).map((c) => c.animalId)), [e.sanidade, hoje]);
-  const lotesVisiveis = e.lotes.filter((l) => moduloAtivo(e.modulos, l.atividade === 'geral' ? 'core' : l.atividade));
+  const perfil = usePerfil();
+  const lotesVisiveis = perfil.lotes;
 
   const lista = useMemo(() => {
     const q = busca.trim().toLowerCase();
     return e.animais
-      .filter((a) => (!statusF || a.status === statusF) && (!loteF || a.loteId === loteF) && (!sexoF || a.sexo === sexoF))
+      .filter((a) => perfil.animalVisivel(a) && (!statusF || a.status === statusF) && (!loteF || a.loteId === loteF) && (!sexoF || a.sexo === sexoF))
       .filter((a) => !q || [a.brinco, a.rfid, a.nome, a.raca, a.sisbov, a.registroGenealogico].some((x) => x?.toLowerCase().includes(q)))
       .map((a) => {
         const hist = ix.pesagens.get(a.id);
@@ -53,12 +53,13 @@ export default function RebanhoPage() {
         return { a, peso, pesado: !!hist?.length, gmd: gmd(hist), cat: categoriaDe(a, hoje, ix.lote.get(a.loteId ?? '')?.fase === 'reprodutores') };
       })
       .sort((x, y) => x.a.brinco.localeCompare(y.a.brinco, 'pt-BR', { numeric: true }));
-  }, [e.animais, busca, statusF, loteF, sexoF, ix, hoje]);
+  }, [e.animais, busca, statusF, loteF, sexoF, ix, hoje, perfil]);
 
   const ativosLista = lista.filter((x) => x.a.status === 'ativo');
   const ua = ativosLista.reduce((s, x) => s + uaDe(x.peso), 0);
   const gmdMedio = gmdGrupo(ativosLista.map((x) => x.a.id), ix.pesagens, addDias(hoje, -120), hoje);
   const conc = conciliarCabecas(lotesVisiveis, e.animais);
+  const atividadesLote = perfil.atividades;
   const divergentes = conc.filter((c) => c.diferenca).length;
 
   function toggle(id: string) {
@@ -72,7 +73,7 @@ export default function RebanhoPage() {
         title={<>Cada cabeça, <Em>no lote e no pasto</Em> certos</>}
         sub="Identificação individual por brinco, botton, chip ou RFID. Sai da caderneta e do WhatsApp para um lugar só."
         actions={<>
-          <button className="btn btn-ghost" onClick={() => setNovoLote({ id: novoId('l'), nome: '', atividade: 'corte', fase: 'recria' })}><Plus className="h-4 w-4" /> Lote</button>
+          <button className="btn btn-ghost" onClick={() => setNovoLote({ id: novoId('l'), nome: '', atividade: perfil.atividades[0] ?? 'corte', fase: perfil.atividades[0] === 'leite' ? 'lactacao' : perfil.atividades[0] === 'genetica' ? 'doadoras' : 'recria' })}><Plus className="h-4 w-4" /> Lote</button>
           <button className="btn btn-primary" onClick={() => setNovo(true)}><Plus className="h-4 w-4" /> Animal</button>
         </>}
       />
@@ -203,7 +204,7 @@ export default function RebanhoPage() {
       )}
 
       <NovoAnimal aberto={novo} onFechar={() => setNovo(false)} />
-      {novoLote ? <EditarLote lote={novoLote} onFechar={() => setNovoLote(null)} /> : null}
+      {novoLote ? <EditarLote lote={novoLote} atividades={atividadesLote} onFechar={() => setNovoLote(null)} /> : null}
       <Modal aberto={mover} onFechar={() => setMover(false)} titulo={`Mover ${sel.size} animal(is)`} eyebrow="Movimentação">
         <MoverLote ids={[...sel]} onFeito={() => { setMover(false); setSel(new Set()); }} />
       </Modal>
@@ -230,7 +231,7 @@ function LinhaContagem({ c, hoje }: { c: ReturnType<typeof conciliarCabecas>[num
   );
 }
 
-function EditarLote({ lote, onFechar }: { lote: Lote; onFechar: () => void }) {
+function EditarLote({ lote, atividades, onFechar }: { lote: Lote; atividades: Atividade[]; onFechar: () => void }) {
   const e = useEstado();
   const [f, setF] = useState<Lote>(lote);
   const fases: Fase[] = ['cria', 'recria', 'engorda', 'confinamento', 'lactacao', 'seca', 'reposicao', 'reprodutores', 'doadoras', 'receptoras'];
@@ -238,7 +239,7 @@ function EditarLote({ lote, onFechar }: { lote: Lote; onFechar: () => void }) {
     <Modal aberto onFechar={onFechar} titulo={lote.nome || 'Novo lote'} eyebrow="Lote">
       <div className="grid grid-cols-2 gap-5">
         <Field label="Nome" className="col-span-2"><Input value={f.nome} onChange={(ev) => setF({ ...f, nome: ev.target.value })} /></Field>
-        <Field label="Atividade"><Select value={f.atividade} onChange={(ev) => setF({ ...f, atividade: ev.target.value as Atividade })} opcoes={(['corte', 'leite', 'genetica'] as Atividade[]).map((a) => ({ value: a, label: ROT_ATIVIDADE[a] }))} /></Field>
+        <Field label="Atividade"><Select value={f.atividade} onChange={(ev) => setF({ ...f, atividade: ev.target.value as Atividade })} opcoes={atividades.map((a) => ({ value: a, label: ROT_ATIVIDADE[a] }))} /></Field>
         <Field label="Fase"><Select value={f.fase} onChange={(ev) => setF({ ...f, fase: ev.target.value as Fase })} opcoes={fases.map((x) => ({ value: x, label: ROT_FASE[x] }))} /></Field>
         <Field label="Piquete" className="col-span-2"><Select value={f.piqueteId ?? ''} onChange={(ev) => setF({ ...f, piqueteId: ev.target.value || undefined })} vazio="Sem piquete (confinamento/curral)" opcoes={e.piquetes.map((p) => ({ value: p.id, label: p.nome }))} /></Field>
       </div>

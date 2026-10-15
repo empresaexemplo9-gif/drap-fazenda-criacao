@@ -12,7 +12,7 @@ import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Scale, Syringe, ArrowRightLeft, ScanLine, CheckCircle2, TriangleAlert, Undo2 } from 'lucide-react';
 import { useEstado, salvar, novoId, remover, atualizar } from '@/lib/store';
-import { useHoje, useIndices } from '@/lib/hooks';
+import { useHoje, useIndices, usePerfil } from '@/lib/hooks';
 import { num } from '@/lib/format';
 import { pesoAtual, carenciasAtivas, categoriaDe, ROTULO_CATEGORIA } from '@/lib/domain/rebanho';
 import { diasEntre } from '@/lib/datas';
@@ -38,7 +38,8 @@ export default function ManejoPage() {
   const [ap, setAp] = useState({ tipo: 'vacina' as TipoSanitario, produto: '', partida: '', dose: '5', carneD: '0', leiteD: '0', insumoId: '' });
   const [aplicacaoId, setAplicacaoId] = useState<string | null>(null);
   // apartação
-  const [destino, setDestino] = useState(e.lotes[0]?.id ?? '');
+  const perfil = usePerfil();
+  const [destino, setDestino] = useState(perfil.lotes[0]?.id ?? '');
   const codRef = useRef<HTMLInputElement>(null);
   const pesoRef = useRef<HTMLInputElement>(null);
 
@@ -184,7 +185,7 @@ export default function ManejoPage() {
 
       {modo === 'apartacao' ? (
         <Card eyebrow="1 · Destino" title="Para qual lote vão os animais lidos" className="mb-5">
-          <Field label="Lote de destino"><Select value={destino} onChange={(ev) => setDestino(ev.target.value)} opcoes={e.lotes.map((l) => ({ value: l.id, label: l.nome }))} /></Field>
+          <Field label="Lote de destino"><Select value={destino} onChange={(ev) => setDestino(ev.target.value)} opcoes={perfil.lotes.map((l) => ({ value: l.id, label: l.nome }))} /></Field>
         </Card>
       ) : null}
 

@@ -19,6 +19,7 @@ export default function CustosPage() {
   const [de0, setDe0] = useState(addDias(hoje, -89));
   const [ate0, setAte0] = useState(hoje);
   const [criterio, setCriterio] = useState<CriterioRateio>('ua_dia');
+  const oQue = [e.modulos.corte && 'a arroba', e.modulos.leite && 'o litro', e.modulos.genetica && 'o plantel PO'].filter(Boolean).join(e.modulos.corte && e.modulos.leite && e.modulos.genetica ? ', ' : ' e ').replace(/, (?=[^,]*$)/, ' e ');
 
   const [de, ate] = periodo === '90' ? [addDias(hoje, -89), hoje] : periodo === '180' ? [addDias(hoje, -179), hoje]
     : periodo === 'safra' ? [periodoSafra(safraDe(hoje))[0], hoje] : [de0, ate0];
@@ -39,8 +40,8 @@ export default function CustosPage() {
 
   return (
     <>
-      <PageHeader eyebrow="VIII · Custo de produção" title={<>Quanto <Em>custou a arroba</Em> e o litro</>}
-        sub="Custo direto do lote mais o rateio de mão de obra, combustível, energia, depreciação e reforma de pasto. O produtor sabe o que vendeu; aqui ele vê quanto custou."
+      <PageHeader eyebrow="VIII · Custo de produção" title={<>Quanto <Em>custou {oQue}</Em></>}
+        sub="Custo direto do lote mais o rateio de mão de obra, combustível, energia, depreciação e reforma de pasto, só entre as atividades que a fazenda pratica. O produtor sabe o que vendeu; aqui ele vê quanto custou."
       />
 
       <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -64,6 +65,13 @@ export default function CustosPage() {
         {moduloAtivo(e.modulos, 'leite') ? <Stat label="Custo do litro" value={lt.custoLitro != null ? brl(lt.custoLitro) : '—'} size="lg"
           tone={leite && lt.custoLitro ? (lt.custoLitro < leite ? 'leaf' : 'alert') : undefined}
           hint={leite ? `leite pago a ${brl(leite)}/L · ${num(lt.litros, 1).replace(',0', '')} L no período` : undefined} /> : null}
+        {moduloAtivo(e.modulos, 'genetica') ? (() => {
+          const gl = c.lotes.filter((l) => l.lote.atividade === 'genetica');
+          const tot = gl.reduce((s, l) => s + l.total, 0);
+          const cab = gl.reduce((s, l) => s + l.cabecasMedias, 0);
+          const meses = Math.max(1, (Date.parse(ate) - Date.parse(de)) / 864e5 / 30.4375);
+          return <Stat label="Custo do plantel PO" value={cab ? brl(tot / cab / meses) : '—'} size="lg" hint={`por cabeça/mês · ${num(cab, 0)} cab · ${brl(tot)} no período`} />;
+        })() : null}
         <Stat label="Resultado por hectare" value={lph != null ? brl(lph) : '—'} tone={lph != null && lph < 0 ? 'alert' : 'leaf'} hint={`${num(area)} ha · resultado ${brl(d.resultado)}`} />
       </StatGrid>
 

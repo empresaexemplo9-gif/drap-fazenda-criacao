@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { Plus, ExternalLink } from 'lucide-react';
 import { useEstado, salvar, salvarVarios, atualizar, novoId } from '@/lib/store';
-import { useHoje, useIndices } from '@/lib/hooks';
+import { useHoje, useIndices, usePerfil } from '@/lib/hooks';
 import { brl, num, isoToBrDate } from '@/lib/format';
 import { addDias, diasEntre, idadeMeses } from '@/lib/datas';
 import { opcoesAcasalamento, PROTOCOLOS_IATF, cronogramaIATF, indicesContemporaneos, LIMITE_F, consanguinidade } from '@/lib/domain/genetica';
@@ -134,7 +134,8 @@ function ReproAssistida() {
   const hoje = useHoje();
   const [protocolo, setProtocolo] = useState(Object.keys(PROTOCOLOS_IATF)[0]);
   const [d0, setD0] = useState(addDias(hoje, 3));
-  const [lote, setLote] = useState(e.lotes.find((l) => l.fase === 'cria' || l.fase === 'doadoras')?.id ?? '');
+  const perfilG = usePerfil();
+  const [lote, setLote] = useState(perfilG.lotes.find((l) => l.fase === 'cria' || l.fase === 'doadoras')?.id ?? '');
   const [novo, setNovo] = useState(false);
   const crono = cronogramaIATF(protocolo, d0);
   const femeas = e.animais.filter((a) => a.status === 'ativo' && a.sexo === 'F' && a.loteId === lote && idadeMeses(a.nascimento, hoje) >= 14);
@@ -168,7 +169,7 @@ function ReproAssistida() {
           <div className="grid grid-cols-2 gap-4">
             <Field label="Protocolo" className="col-span-2"><Select value={protocolo} onChange={(ev) => setProtocolo(ev.target.value)} opcoes={Object.keys(PROTOCOLOS_IATF).map((p) => ({ value: p, label: p }))} /></Field>
             <Field label="D0"><Input type="date" value={d0} onChange={(ev) => setD0(ev.target.value)} /></Field>
-            <Field label="Lote"><Select value={lote} onChange={(ev) => setLote(ev.target.value)} opcoes={e.lotes.map((l) => ({ value: l.id, label: l.nome }))} /></Field>
+            <Field label="Lote"><Select value={lote} onChange={(ev) => setLote(ev.target.value)} opcoes={perfilG.lotes.map((l) => ({ value: l.id, label: l.nome }))} /></Field>
           </div>
           <ul className="mt-4 divide-y divide-rule/40 text-[13px]">{crono.map((c) => <li key={c.data + c.acao} className="flex justify-between gap-3 py-1.5"><span>{c.acao}</span><span className="num text-earth">{isoToBrDate(c.data)}</span></li>)}</ul>
           <div className="mt-4 flex items-center justify-between">

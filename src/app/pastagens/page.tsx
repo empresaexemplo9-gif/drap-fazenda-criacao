@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { Plus } from 'lucide-react';
 import { useEstado, salvar, atualizar, novoId } from '@/lib/store';
-import { useHoje, useIndices } from '@/lib/hooks';
+import { useHoje, useIndices, usePerfil } from '@/lib/hooks';
 import { num, isoToBrDate } from '@/lib/format';
 import { addDias, estacao } from '@/lib/datas';
 import { lotacaoPiquetes, gmdGrupo, animaisDoLote } from '@/lib/domain/rebanho';
@@ -20,6 +20,7 @@ export default function PastagensPage() {
   const hoje = useHoje();
   const ix = useIndices();
   const [edit, setEdit] = useState<Piquete | null>(null);
+  const perfil = usePerfil();
 
   const lot = useMemo(() => lotacaoPiquetes(e.piquetes, e.lotes, e.animais, ix.pesagens, hoje), [e.piquetes, e.lotes, e.animais, ix.pesagens, hoje]);
   const area = e.piquetes.reduce((s, p) => s + p.areaHa, 0);
@@ -96,7 +97,7 @@ export default function PastagensPage() {
                 {l.piquete.status !== 'reforma' ? <button className="btn btn-ghost btn-sm" onClick={() => atualizar('piquetes', l.piquete.id, { status: 'reforma', desde: hoje })}>Reforma</button> : null}
                 <select className="field-input w-auto py-1 text-[12.5px]" value="" onChange={(ev) => ev.target.value && moverLote(ev.target.value, l.piquete)} aria-label="Trazer lote">
                   <option value="">Trazer lote…</option>
-                  {e.lotes.filter((x) => x.piqueteId !== l.piquete.id && x.fase !== 'confinamento').map((x) => <option key={x.id} value={x.id}>{x.nome}</option>)}
+                  {perfil.lotes.filter((x) => x.piqueteId !== l.piquete.id && x.fase !== 'confinamento').map((x) => <option key={x.id} value={x.id}>{x.nome}</option>)}
                 </select>
               </div>
             </Card>

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { Plus, Search } from 'lucide-react';
 import { useEstado, salvar, novoId } from '@/lib/store';
-import { useHoje, useIndices } from '@/lib/hooks';
+import { useHoje, useIndices, usePerfil } from '@/lib/hooks';
 import { isoToBrDate, num } from '@/lib/format';
 import { carenciasAtivas, animaisDoLote } from '@/lib/domain/rebanho';
 import { sugestoes, sugestaoParaEvento } from '@/lib/domain/calendario';
@@ -22,7 +22,8 @@ export default function SanidadePage() {
   const [nova, setNova] = useState(false);
   const [partida, setPartida] = useState('');
 
-  const carencias = useMemo(() => carenciasAtivas(e.sanidade, hoje).sort((a, b) => a.liberaCarne.localeCompare(b.liberaCarne)), [e.sanidade, hoje]);
+  const perfilS = usePerfil();
+  const carencias = useMemo(() => carenciasAtivas(e.sanidade, hoje).filter((c) => { const a = ix.animal.get(c.animalId); return !a || perfilS.animalVisivel(a); }).sort((a, b) => a.liberaCarne.localeCompare(b.liberaCarne)), [e.sanidade, hoje, ix, perfilS]);
   const sugs = useMemo(() => sugestoes(e, hoje, 120).filter((s) => s.tipo === 'sanitario'), [e, hoje]);
   const hist = [...e.sanidade].sort((a, b) => b.data.localeCompare(a.data));
   const rastreio = partida.trim() ? e.sanidade.filter((s) => s.partida.toLowerCase().includes(partida.trim().toLowerCase())) : [];
@@ -152,6 +153,7 @@ export default function SanidadePage() {
 
 function NovaAplicacao({ aberto, onFechar }: { aberto: boolean; onFechar: () => void }) {
   const e = useEstado();
+  const perfil = usePerfil();
   const hoje = useHoje();
   const [f, setF] = useState({ data: hoje, tipo: 'vacina' as TipoSanitario, produto: '', partida: '', validade: '', dose: '5', carne: '0', leite: '0', motivo: '', insumoId: '', lotes: [] as string[] });
   const animais = f.lotes.flatMap((l) => animaisDoLote(e.animais, l));
@@ -185,7 +187,7 @@ function NovaAplicacao({ aberto, onFechar }: { aberto: boolean; onFechar: () => 
       <div className="mt-5">
         <span className="field-label">Lotes</span>
         <div className="flex flex-wrap gap-2">
-          {e.lotes.map((l) => {
+          {perfil.lotes.map((l) => {
             const on = f.lotes.includes(l.id);
             return <button key={l.id} type="button" onClick={() => setF({ ...f, lotes: on ? f.lotes.filter((x) => x !== l.id) : [...f.lotes, l.id] })}
               className={`rounded-full border px-3 py-1 text-[12.5px] ${on ? 'border-leaf bg-leafLt text-leafDk' : 'border-rule text-muted hover:text-ink'}`}>{l.nome} <span className="num">({animaisDoLote(e.animais, l.id).length})</span></button>;

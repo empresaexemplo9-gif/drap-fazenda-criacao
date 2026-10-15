@@ -46,3 +46,58 @@ export function moduloAtivo(modulos: Record<ModuloId, boolean>, id: ModuloId): b
 export function precoTotal(modulos: Record<ModuloId, boolean>): number {
   return MODULOS.filter((m) => moduloAtivo(modulos, m.id)).reduce((s, m) => s + m.precoMes, 0);
 }
+
+export type ModuloProdutivo = Exclude<ModuloId, 'core'>;
+export const MODULOS_PRODUTIVOS: ModuloProdutivo[] = ['corte', 'leite', 'genetica'];
+
+export const ROTULO_MODULO: Record<ModuloProdutivo, string> = { corte: 'Corte', leite: 'Leite', genetica: 'Genética' };
+
+/**
+ * Atividades que a fazenda pratica. A maioria dos produtores trabalha com uma
+ * só (corte, leite ou genética); outros combinam duas ou as três. Todo o
+ * núcleo (lotes, plano de contas, custos, mercado, painel) se recorta por aqui.
+ */
+export function atividadesAtivas(modulos: Record<ModuloId, boolean>): ModuloProdutivo[] {
+  return MODULOS_PRODUTIVOS.filter((m) => modulos[m]);
+}
+
+/** A plataforma precisa de pelo menos uma atividade produtiva contratada. */
+export function podeDesativar(modulos: Record<ModuloId, boolean>, id: ModuloId): boolean {
+  if (id === 'core') return false;
+  return atividadesAtivas(modulos).filter((m) => m !== id).length > 0;
+}
+
+export interface Perfil { id: string; nome: string; modulos: ModuloProdutivo[]; resumo: string }
+
+/** As sete combinações possíveis, como o produtor se descreve na feira. */
+export const PERFIS: Perfil[] = [
+  { id: 'corte', nome: 'Só corte', modulos: ['corte'], resumo: 'Cria, recria, engorda ou confinamento.' },
+  { id: 'leite', nome: 'Só leite', modulos: ['leite'], resumo: 'Ordenha, qualidade e reprodução do rebanho leiteiro.' },
+  { id: 'genetica', nome: 'Só genética', modulos: ['genetica'], resumo: 'Seleção e venda de reprodutores e matrizes PO.' },
+  { id: 'corte+leite', nome: 'Corte e leite', modulos: ['corte', 'leite'], resumo: 'Leite com venda de machos e descarte para corte.' },
+  { id: 'corte+genetica', nome: 'Corte e genética', modulos: ['corte', 'genetica'], resumo: 'Plantel PO e rebanho comercial.' },
+  { id: 'leite+genetica', nome: 'Leite e genética', modulos: ['leite', 'genetica'], resumo: 'Leite com seleção e venda de genética leiteira.' },
+  { id: 'completo', nome: 'Corte, leite e genética', modulos: ['corte', 'leite', 'genetica'], resumo: 'Operação completa.' },
+];
+
+export function modulosDoPerfil(p: Perfil): Record<ModuloId, boolean> {
+  return { core: true, corte: p.modulos.includes('corte'), leite: p.modulos.includes('leite'), genetica: p.modulos.includes('genetica') };
+}
+
+export function perfilDe(modulos: Record<ModuloId, boolean>): Perfil | undefined {
+  const at = atividadesAtivas(modulos).join('+');
+  return PERFIS.find((p) => p.modulos.join('+') === at);
+}
+
+/**
+ * Atividade econômica de cada conta de receita. Contas sem entrada aqui
+ * servem a qualquer atividade (insumos, mão de obra, financeiro).
+ */
+export const ATIVIDADE_DA_CONTA: Record<string, ModuloProdutivo> = {
+  '4.1.01': 'corte', '4.1.02': 'corte', '4.1.03': 'leite', '4.1.04': 'genetica', '4.1.05': 'genetica',
+};
+
+export function contaVisivel(codigo: string, modulos: Record<ModuloId, boolean>): boolean {
+  const a = ATIVIDADE_DA_CONTA[codigo];
+  return !a || !!modulos[a];
+}

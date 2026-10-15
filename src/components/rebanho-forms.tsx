@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useEstado, salvar, salvarVarios, novoId } from '@/lib/store';
-import { useHoje } from '@/lib/hooks';
+import { useHoje, usePerfil } from '@/lib/hooks';
 import { addDias } from '@/lib/datas';
 import type { Animal, Sexo } from '@/lib/domain/types';
 import { Field, Input, Select, Modal, Textarea } from './ui';
@@ -10,7 +10,8 @@ import { Field, Input, Select, Modal, Textarea } from './ui';
 export function MoverLote({ ids, onFeito }: { ids: string[]; onFeito: () => void }) {
   const e = useEstado();
   const hoje = useHoje();
-  const [para, setPara] = useState(e.lotes[0]?.id ?? '');
+  const { lotes } = usePerfil();
+  const [para, setPara] = useState(lotes[0]?.id ?? '');
   const [motivo, setMotivo] = useState('Apartação');
   function confirmar() {
     const de = new Set(ids.map((id) => e.animais.find((a) => a.id === id)?.loteId));
@@ -20,7 +21,7 @@ export function MoverLote({ ids, onFeito }: { ids: string[]; onFeito: () => void
   }
   return (
     <div className="space-y-5">
-      <Field label="Para o lote"><Select value={para} onChange={(ev) => setPara(ev.target.value)} opcoes={e.lotes.map((l) => ({ value: l.id, label: l.nome }))} /></Field>
+      <Field label="Para o lote"><Select value={para} onChange={(ev) => setPara(ev.target.value)} opcoes={lotes.map((l) => ({ value: l.id, label: l.nome }))} /></Field>
       <Field label="Motivo"><Input value={motivo} onChange={(ev) => setMotivo(ev.target.value)} /></Field>
       <div className="flex justify-end"><button className="btn btn-primary" onClick={confirmar} disabled={!para}>Mover</button></div>
     </div>
@@ -30,7 +31,9 @@ export function MoverLote({ ids, onFeito }: { ids: string[]; onFeito: () => void
 export function NovoAnimal({ aberto, onFechar, inicial }: { aberto: boolean; onFechar: () => void; inicial?: Partial<Animal> }) {
   const e = useEstado();
   const hoje = useHoje();
-  const vazio: Partial<Animal> = { sexo: 'M', raca: 'Nelore', nascimento: addDias(hoje, -365), origem: 'nascido', status: 'ativo', loteId: e.lotes[0]?.id, ...inicial };
+  const perfil = usePerfil();
+  const racaPadrao = perfil.so === 'leite' ? 'Girolando 3/4' : perfil.so === 'genetica' ? 'Nelore PO' : 'Nelore';
+  const vazio: Partial<Animal> = { sexo: perfil.so === 'leite' ? 'F' : 'M', raca: racaPadrao, nascimento: addDias(hoje, -365), origem: 'nascido', status: 'ativo', loteId: perfil.lotes[0]?.id, ...inicial };
   const [f, setF] = useState<Partial<Animal>>(vazio);
   const [peso, setPeso] = useState('');
   const [erro, setErro] = useState('');
@@ -66,7 +69,7 @@ export function NovoAnimal({ aberto, onFechar, inicial }: { aberto: boolean; onF
         <Field label="Sexo"><Select value={f.sexo} onChange={(ev) => set('sexo', ev.target.value as Sexo)} opcoes={[{ value: 'M', label: 'Macho' }, { value: 'F', label: 'Fêmea' }]} /></Field>
         <Field label="Raça"><Input value={f.raca ?? ''} onChange={(ev) => set('raca', ev.target.value)} list="racas" /></Field>
         <Field label="Nascimento"><Input type="date" value={f.nascimento} onChange={(ev) => set('nascimento', ev.target.value)} /></Field>
-        <Field label="Lote"><Select value={f.loteId ?? ''} onChange={(ev) => set('loteId', ev.target.value)} vazio="Sem lote" opcoes={e.lotes.map((l) => ({ value: l.id, label: l.nome }))} /></Field>
+        <Field label="Lote"><Select value={f.loteId ?? ''} onChange={(ev) => set('loteId', ev.target.value)} vazio="Sem lote" opcoes={perfil.lotes.map((l) => ({ value: l.id, label: l.nome }))} /></Field>
         <Field label="Origem"><Select value={f.origem} onChange={(ev) => set('origem', ev.target.value as Animal['origem'])} opcoes={[{ value: 'nascido', label: 'Nascido na fazenda' }, { value: 'comprado', label: 'Comprado' }]} /></Field>
         {!f.id ? <Field label="Peso de entrada (kg)"><Input inputMode="decimal" value={peso} onChange={(ev) => setPeso(ev.target.value)} /></Field> : null}
         {f.origem === 'comprado' ? <>

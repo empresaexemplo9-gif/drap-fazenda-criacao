@@ -3,10 +3,10 @@
 import { useRef, useState } from 'react';
 import { Download, Upload, RotateCcw, Eraser } from 'lucide-react';
 import {
-  useEstado, definirFazenda, definirModulo, exportarJSON, importarJSON, restaurarDemo, comecarDoZero, sincronizar, URL_SYNC, definirParcial,
+  useEstado, definirFazenda, definirModulo, exportarJSON, importarJSON, restaurarDemo, comecarDoZero, sincronizar, URL_SYNC, definirParcial, refazerPerfil,
 } from '@/lib/store';
 import { brl, isoToBrDate } from '@/lib/format';
-import { MODULOS, moduloAtivo, precoTotal } from '@/lib/domain/modulos';
+import { MODULOS, moduloAtivo, precoTotal, podeDesativar, perfilDe } from '@/lib/domain/modulos';
 import { PageHeader, Em, Card, Field, Input, Select, Badge, Aviso, cx } from '@/components/ui';
 
 export default function ConfigPage() {
@@ -50,7 +50,8 @@ export default function ConfigPage() {
         </div>
       </Card>
 
-      <Card className="mt-6" eyebrow={`Assinatura de referência · ${brl(precoTotal(e.modulos))}/mês`} title="Módulos">
+      <Card className="mt-6" eyebrow={`Assinatura de referência · ${brl(precoTotal(e.modulos))}/mês`} title={`Módulos · ${perfilDe(e.modulos)?.nome ?? ''}`}
+        actions={<button className="text-[12px] font-medium text-earth hover:text-ink" onClick={refazerPerfil}>refazer escolha</button>}>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {MODULOS.map((m) => {
             const on = moduloAtivo(e.modulos, m.id);
@@ -62,8 +63,9 @@ export default function ConfigPage() {
                     <p className="num text-[12px] text-earth">{brl(m.precoMes)}/mês</p>
                   </div>
                   {m.obrigatorio ? <Badge tone="ink">incluso</Badge> : (
-                    <button type="button" role="switch" aria-checked={on} onClick={() => definirModulo(m.id, !on)}
-                      className={cx('relative h-6 w-11 rounded-full transition-colors', on ? 'bg-leaf' : 'bg-rule')} aria-label={`Ativar ${m.nome}`}>
+                    <button type="button" role="switch" aria-checked={on} onClick={() => definirModulo(m.id, !on)} disabled={on && !podeDesativar(e.modulos, m.id)}
+                      title={on && !podeDesativar(e.modulos, m.id) ? 'A fazenda precisa de pelo menos uma atividade' : undefined}
+                      className={cx('relative h-6 w-11 rounded-full transition-colors disabled:cursor-not-allowed disabled:opacity-60', on ? 'bg-leaf' : 'bg-rule')} aria-label={`Ativar ${m.nome}`}>
                       <span className={cx('absolute top-0.5 h-5 w-5 rounded-full bg-paper transition-all', on ? 'left-[22px]' : 'left-0.5')} />
                     </button>
                   )}
@@ -74,7 +76,7 @@ export default function ConfigPage() {
             );
           })}
         </div>
-        <p className="mt-4 text-[12px] text-muted">Preços são hipóteses de pesquisa para validar na feira, não tabela comercial.</p>
+        <p className="mt-4 text-[12px] text-muted">Cada produtor contrata só o que faz: uma atividade, duas ou as três. Desligar um módulo esconde as telas e os lotes dele, sem apagar dados. Pelo menos um módulo produtivo fica ligado. Preços são hipóteses de pesquisa para validar na feira.</p>
       </Card>
 
       <Card className="mt-6" eyebrow="Laticínio" title="Tabela de pagamento do leite">
@@ -104,9 +106,9 @@ export default function ConfigPage() {
       </Card>
 
       <Card className="mt-6" eyebrow="Demonstração" title="Fazenda de exemplo">
-        <p className="text-[13px] text-muted">A Fazenda Boa Vista é fictícia e vem preenchida para a demo da feira e para a revisão.</p>
+        <p className="text-[13px] text-muted">A Fazenda Boa Vista é fictícia. A demo é montada só com as atividades ligadas acima ({perfilDe(e.modulos)?.nome ?? '—'}). Ligue ou desligue módulos e recarregue para ver cada perfil.</p>
         <div className="mt-4 flex flex-wrap gap-2">
-          <button className="btn btn-ghost" onClick={() => { if (confirm('Substituir todos os dados pela fazenda de demonstração?')) restaurarDemo(); }}><RotateCcw className="h-4 w-4" /> Recarregar demo</button>
+          <button className="btn btn-ghost" onClick={() => { if (confirm('Substituir todos os dados pela fazenda de demonstração deste perfil?')) restaurarDemo(); }}><RotateCcw className="h-4 w-4" /> Recarregar demo deste perfil</button>
           <button className="btn btn-ghost text-alert" onClick={() => { if (confirm('Apagar todos os dados deste aparelho e começar do zero? Baixe um backup antes.')) comecarDoZero(); }}><Eraser className="h-4 w-4" /> Começar do zero</button>
         </div>
       </Card>

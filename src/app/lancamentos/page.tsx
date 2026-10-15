@@ -3,11 +3,12 @@
 import { useMemo, useState } from 'react';
 import { Plus, Search, Trash2, Pencil, Download } from 'lucide-react';
 import { useEstado, remover } from '@/lib/store';
-import { useHoje } from '@/lib/hooks';
+import { useHoje, usePerfil } from '@/lib/hooks';
 import { brl, isoToBrDate } from '@/lib/format';
 import { addDias, periodoSafra, safraDe } from '@/lib/datas';
 import { razao, balancete, dre, nomeConta, nivel, saldoConta, CONTAS_DISPONIVEL } from '@/lib/domain/livro-razao';
 import { ROT_ATIVIDADE } from '@/lib/rotulos';
+import { contaVisivel } from '@/lib/domain/modulos';
 import type { Atividade, Lancamento } from '@/lib/domain/types';
 import { PageHeader, Em, Card, Tabs, Tabela, Badge, Field, Input, Select, Empty, StatGrid, Stat, cx } from '@/components/ui';
 import { LancamentoForm } from '@/components/lancamento-form';
@@ -17,6 +18,7 @@ type Aba = 'diario' | 'razao' | 'balancete' | 'dre' | 'plano';
 
 export default function LancamentosPage() {
   const e = useEstado();
+  const perfil = usePerfil();
   const hoje = useHoje();
   const [aba, setAba] = useState<Aba>('diario');
   const [form, setForm] = useState<{ aberto: boolean; inicial?: Partial<Lancamento> }>({ aberto: false });
@@ -72,7 +74,7 @@ export default function LancamentosPage() {
 
       <Tabs<Aba> ativa={aba} onChange={setAba} abas={[
         { id: 'diario', label: 'Lançamentos' }, { id: 'razao', label: 'Razão por conta' }, { id: 'balancete', label: 'Balancete' },
-        { id: 'dre', label: 'DRE por atividade' }, { id: 'plano', label: 'Plano de contas' },
+        { id: 'dre', label: perfil.atividades.length > 1 ? 'DRE por atividade' : 'DRE' }, { id: 'plano', label: 'Plano de contas' },
       ]} />
 
       {(aba === 'diario' || aba === 'razao' || aba === 'balancete') && (
@@ -80,10 +82,10 @@ export default function LancamentosPage() {
           <Field label="De"><Input type="date" value={de} onChange={(ev) => setDe(ev.target.value)} /></Field>
           <Field label="Até"><Input type="date" value={ate} onChange={(ev) => setAte(ev.target.value)} /></Field>
           {aba === 'diario' ? <>
-            <Field label="Atividade"><Select value={ativ} onChange={(ev) => setAtiv(ev.target.value as Atividade | '')} vazio="Todas" opcoes={(Object.keys(ROT_ATIVIDADE) as Atividade[]).map((a) => ({ value: a, label: ROT_ATIVIDADE[a] }))} /></Field>
+            <Field label="Atividade"><Select value={ativ} onChange={(ev) => setAtiv(ev.target.value as Atividade | '')} vazio="Todas" opcoes={([...perfil.atividades, 'geral'] as Atividade[]).map((a) => ({ value: a, label: ROT_ATIVIDADE[a] }))} /></Field>
             <Field label="Buscar"><div className="relative"><Search className="absolute left-0 top-2.5 h-4 w-4 text-muted" /><Input className="pl-6" value={busca} onChange={(ev) => setBusca(ev.target.value)} placeholder="histórico, NF, conta…" /></div></Field>
           </> : null}
-          {aba === 'razao' ? <Field label="Conta" className="col-span-2"><Select value={conta} onChange={(ev) => setConta(ev.target.value)} opcoes={e.contas.filter((c) => nivel(c.codigo) === 3).map((c) => ({ value: c.codigo, label: `${c.codigo} · ${c.nome}` }))} /></Field> : null}
+          {aba === 'razao' ? <Field label="Conta" className="col-span-2"><Select value={conta} onChange={(ev) => setConta(ev.target.value)} opcoes={e.contas.filter((c) => nivel(c.codigo) === 3 && contaVisivel(c.codigo, e.modulos)).map((c) => ({ value: c.codigo, label: `${c.codigo} · ${c.nome}` }))} /></Field> : null}
         </div>
       )}
 
@@ -154,7 +156,7 @@ export default function LancamentosPage() {
       {aba === 'plano' && (
         <Card eyebrow="Três níveis · como no DRAP Fazenda" title="Plano de contas da pecuária">
           <ul className="text-[13.5px]">
-            {e.contas.map((c) => (
+            {e.contas.filter((c) => contaVisivel(c.codigo, e.modulos)).map((c) => (
               <li key={c.codigo} className={cx('flex items-baseline justify-between gap-3 border-b border-rule/30 py-1.5', nivel(c.codigo) === 1 && 'mt-3 font-display text-lg font-semibold', nivel(c.codigo) === 2 && 'font-semibold')}
                 style={{ paddingLeft: `${(nivel(c.codigo) - 1) * 18}px` }}>
                 <span><span className="num mr-2 text-earth">{c.codigo}</span>{c.nome}</span>
@@ -221,7 +223,9 @@ function Balancete({ de, ate }: { de: string; ate: string }) {
 function DreAtividades({ safra }: { safra: string }) {
   const e = useEstado();
   const [de, ate] = periodoSafra(safra);
-  const ativs: (Atividade | undefined)[] = [undefined, 'corte', 'leite', 'genetica', 'geral'];
+  const perfil = usePerfil();
+  // uma atividade só: a coluna da fazenda já é a da atividade
+  const ativs: (Atividade | undefined)[] = perfil.atividades.length > 1 ? [undefined, ...perfil.atividades, 'geral'] : [undefined];
   const dres = ativs.map((a) => ({ a, d: dre(e.lancamentos, e.contas, de, ate, a) }));
   const total = dres[0].d;
   return (
@@ -241,7 +245,7 @@ function DreAtividades({ safra }: { safra: string }) {
             ))}
           </tbody>
         </Tabela>
-        <p className="mt-3 text-[12px] text-muted">A coluna “Geral” reúne custos comuns ainda não rateados. O rateio por UA·dia está em Custo de produção.</p>
+        {ativs.length > 1 ? <p className="mt-3 text-[12px] text-muted">A coluna “Geral” reúne custos comuns ainda não rateados. O rateio por UA·dia entre as atividades está em Custo de produção.</p> : null}
       </Card>
       <Card eyebrow="Para onde foi o dinheiro" title="Custos por conta na safra">
         <BarrasH itens={total.porConta.filter((x) => x.conta.natureza === 'despesa').sort((a, b) => b.valor - a.valor).map((x) => ({ rotulo: `${x.conta.codigo} · ${x.conta.nome}`, valor: x.valor }))} formatar={brl} />

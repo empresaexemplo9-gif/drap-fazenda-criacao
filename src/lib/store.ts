@@ -12,6 +12,7 @@
 
 import { useSyncExternalStore } from 'react';
 import { estadoDemo, estadoVazio, VERSAO_ESTADO } from './seed';
+import { podeDesativar } from './domain/modulos';
 import { hojeISO } from './datas';
 import type { Colecoes, Estado, Fazenda, Id, ModuloId, Pendente } from './domain/types';
 
@@ -141,10 +142,22 @@ export function definirFazenda(patch: Partial<Fazenda>) {
   definir({ ...e, fazenda: { ...e.fazenda, ...patch } });
 }
 
+/** Liga ou desliga um módulo. Nunca deixa a fazenda sem atividade produtiva. */
 export function definirModulo(id: ModuloId, ativo: boolean) {
   if (id === 'core') return;
   const e = obter();
+  if (!ativo && !podeDesativar(e.modulos, id)) return;
   definir({ ...e, modulos: { ...e.modulos, [id]: ativo } });
+}
+
+/**
+ * Primeiro acesso: o produtor diz o que faz (só corte, só leite, só
+ * genética ou uma combinação) e escolhe começar com a demo daquele perfil
+ * ou com a fazenda vazia.
+ */
+export function iniciarPerfil(modulos: Record<ModuloId, boolean>, comDemo: boolean) {
+  const base = comDemo ? estadoDemo(hojeISO(), modulos) : { ...estadoVazio(), modulos };
+  definir({ ...base, modulos: { ...modulos, core: true }, perfilDefinido: true });
 }
 
 export function definirOperador(id: Id) {
@@ -155,12 +168,24 @@ export function definirParcial(patch: Partial<Estado>) {
   definir({ ...obter(), ...patch });
 }
 
-export function restaurarDemo() {
-  definir(estadoDemo(hojeISO()));
+/** Recarrega a demo recortada para os módulos atuais (ou os informados). */
+export function restaurarDemo(modulos?: Record<ModuloId, boolean>) {
+  const m = modulos ?? obter().modulos;
+  definir({ ...estadoDemo(hojeISO(), m), perfilDefinido: true });
 }
 
 export function comecarDoZero() {
-  definir(estadoVazio());
+  definir({ ...estadoVazio(), modulos: obter().modulos, perfilDefinido: true });
+}
+
+/** Confirma o perfil mantendo os dados que já estão no aparelho. */
+export function confirmarPerfil(modulos: Record<ModuloId, boolean>) {
+  definir({ ...obter(), modulos: { ...modulos, core: true }, perfilDefinido: true });
+}
+
+/** Volta para a escolha de perfil do primeiro acesso. */
+export function refazerPerfil() {
+  definir({ ...obter(), perfilDefinido: false });
 }
 
 export function exportarJSON(): string {

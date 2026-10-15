@@ -3,6 +3,8 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import { Loader2 } from 'lucide-react';
 import { Header } from './header';
+import { BoasVindas } from './boas-vindas';
+import { useEstado } from '@/lib/store';
 
 /**
  * Os dados vivem no aparelho, então a página só renderiza depois de montar
@@ -10,6 +12,7 @@ import { Header } from './header';
  */
 export function AppShell({ children }: { children: ReactNode }) {
   const [pronto, setPronto] = useState(false);
+  const e = useEstado();
   useEffect(() => {
     setPronto(true);
     if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
@@ -23,6 +26,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </div>
     );
   }
+  if (!e.perfilDefinido) return <BoasVindas />;
   return (
     <>
       <Header />

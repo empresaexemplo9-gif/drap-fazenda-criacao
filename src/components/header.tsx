@@ -138,7 +138,7 @@ export function Header() {
                   if (!itens.length) return null;
                   return (
                     <div key={g} className="mt-3">
-                      <div className="eyebrow px-5 pb-1">{g}</div>
+                      <div className="eyebrow px-5 pb-1">{g === 'Módulos' ? 'Seus módulos' : g}</div>
                       {itens.map((item) => {
                         const on = ativo(path, item.href);
                         return (

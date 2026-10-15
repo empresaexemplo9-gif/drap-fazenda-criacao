@@ -7,12 +7,14 @@
  */
 
 import { addDias, addMeses, safraDe } from './datas';
+import { atividadesAtivas } from './domain/modulos';
+import { uaDe, pesoAtual, indexarPesagens } from './domain/rebanho';
 import { PLANO_PADRAO, CONTA_BANCO, CONTA_FORNECEDORES, CONTA_CLIENTES } from './domain/livro-razao';
 import type {
   Animal, Estado, Lote, Piquete, Pesagem, AplicacaoSanitaria, Insumo, MovEstoque, Lancamento,
   Evento, Pessoa, Cotacao, Dieta, LeituraCocho, VendaAbate, Ordenha, AnaliseLeite,
   CasoMastite, EventoReprodutivo, AvaliacaoGenetica, ProvaDesempenho, Acasalamento,
-  Anuncio, Atividade, Fase, Sexo, ISODate, Ocorrencia,
+  Anuncio, Atividade, Fase, Sexo, ISODate, Ocorrencia, ModuloId, Id,
 } from './domain/types';
 
 export const VERSAO_ESTADO = 1;
@@ -58,7 +60,16 @@ function tabelaPadrao() {
   };
 }
 
-export function estadoDemo(hoje: ISODate): Estado {
+/**
+ * Demo completa (corte + leite + genética) recortada para as atividades do
+ * perfil escolhido. Sem `modulos`, devolve a fazenda completa.
+ */
+export function estadoDemo(hoje: ISODate, modulos?: Record<ModuloId, boolean>): Estado {
+  const completo = demoCompleta(hoje);
+  return modulos ? recortarPorModulos(completo, modulos) : completo;
+}
+
+function demoCompleta(hoje: ISODate): Estado {
   const r = rng(20261015);
   const between = (a: number, b: number) => a + (b - a) * r();
   const int = (a: number, b: number) => Math.floor(between(a, b + 1));
@@ -299,13 +310,13 @@ export function estadoDemo(hoje: ISODate): Estado {
     const base = addMeses(hoje, -m).slice(0, 8);
     const dia = (n: number) => `${base}${String(n).padStart(2, '0')}`;
     if (dia(5) <= hoje) {
-      L_({ data: dia(5), historico: 'Folha de pagamento e encargos', debito: '5.2.01', credito: CONTA_BANCO, valor: 14500, atividade: 'geral', formaPgto: 'TRANSFER' });
+      L_({ data: dia(5), historico: 'Folha de pagamento e encargos', debito: '5.2.01', credito: CONTA_BANCO, valor: 11000, atividade: 'geral', formaPgto: 'TRANSFER' });
       L_({ data: dia(10), historico: 'Energia elétrica · ordenha e resfriador', debito: '5.2.04', credito: CONTA_BANCO, valor: Math.round(between(2600, 3300) * 100) / 100, atividade: 'leite', fornecedor: 'Energia Rural', formaPgto: 'BOLETO' });
       L_({ data: dia(12), historico: 'Diesel S10 · tratores e vagão', debito: '5.2.02', credito: CONTA_BANCO, valor: Math.round(between(5500, 7500) * 100) / 100, atividade: 'geral', fornecedor: 'Posto Rodovia', formaPgto: 'PIX' });
       L_({ data: dia(15), historico: 'Sal mineral e proteinado', debito: '5.1.01', credito: CONTA_BANCO, valor: Math.round(between(9000, 12000) * 100) / 100, atividade: 'corte', fornecedor: 'Nutrição Cerrado', formaPgto: 'BOLETO' });
       L_({ data: dia(18), historico: 'Concentrado vacas em lactação', debito: '5.1.02', credito: CONTA_BANCO, valor: Math.round(between(9000, 11000) * 100) / 100, atividade: 'leite', loteId: L.lactacao.id, fornecedor: 'Nutrição Cerrado', formaPgto: 'BOLETO' });
       L_({ data: dia(20), historico: 'Assistência veterinária mensal', debito: '5.2.06', credito: CONTA_BANCO, valor: 3500, atividade: 'geral', fornecedor: 'Dr. Paulo Mendes', formaPgto: 'PIX' });
-      L_({ data: dia(28), historico: 'Depreciação mensal de máquinas e benfeitorias', debito: '5.2.07', credito: '1.3.01', valor: 3800, atividade: 'geral' });
+      L_({ data: dia(28), historico: 'Depreciação mensal de máquinas e benfeitorias', debito: '5.2.07', credito: '1.3.01', valor: 2800, atividade: 'geral' });
     }
     if (m >= 1 && dia(8) <= hoje) {
       const litros = Math.round(between(10500, 12500));
@@ -423,7 +434,7 @@ export function estadoDemo(hoje: ISODate): Estado {
       }
     }
     const pico = between(22, 32);
-    for (let k = 29; k >= 0; k--) {
+    for (let k = 89; k >= 0; k--) {
       const dataO = d(-k);
       const delO = delHoje - k;
       if (delO < 0) continue;
@@ -448,6 +459,12 @@ export function estadoDemo(hoje: ISODate): Estado {
     const d0 = d(-75);
     reproducao.push({ id: id('rp'), data: addDias(d0, 11), animalId: m.id, tipo: 'iatf', semen: touroCorte, protocolo: 'P4 9 dias (Ovsynch adaptado)', por: vaqueiro.id, em });
     reproducao.push({ id: id('rp'), data: addDias(d0, 41), animalId: m.id, tipo: 'diagnostico', resultado: i % 5 === 0 || i % 7 === 0 ? 'vazia' : 'prenhe', por: vet.id, em });
+  });
+  // doadoras PO: IATF com sêmen próprio e diagnóstico (taxa de prenhez da genética)
+  doadoras.forEach((dd, i) => {
+    const ia = d(-70 - i * 3);
+    reproducao.push({ id: id('rp'), data: ia, animalId: dd.id, tipo: 'iatf', semen: 'Barão da Boa Vista (próprio)', protocolo: 'P4 8 dias', por: vet.id, em });
+    reproducao.push({ id: id('rp'), data: addDias(ia, 30), animalId: dd.id, tipo: 'diagnostico', resultado: i % 3 === 2 ? 'vazia' : 'prenhe', por: vet.id, em });
   });
   e.ordenhas = ordenhas;
   e.reproducao = reproducao;
@@ -496,4 +513,85 @@ export function estadoDemo(hoje: ISODate): Estado {
 
   void dono; void ordenhadora;
   return e;
+}
+
+/**
+ * Recorta um estado para as atividades contratadas: tira lotes, animais e
+ * todo o histórico ligado a eles, lançamentos e receitas das atividades
+ * fora do perfil, insumos e cotações que não se aplicam. Custos "geral"
+ * (folha, diesel, depreciação) são reduzidos na proporção das UA que
+ * ficam, para a demo de uma fazenda só de leite não carregar a folha de
+ * uma fazenda completa.
+ */
+export function recortarPorModulos(e: Estado, modulos: Record<ModuloId, boolean>): Estado {
+  const at = new Set<string>(atividadesAtivas(modulos));
+  if (at.size === 3) return { ...e, modulos: { ...modulos, core: true } };
+  const hoje = e.lancamentos.map((l) => l.data).sort().pop() ?? '2026-01-01';
+  const lotes = e.lotes.filter((l) => at.has(l.atividade));
+  const loteIds = new Set(lotes.map((l) => l.id));
+  // animais sem lote (vendidos e mortos da demo) são do corte
+  const animais = e.animais.filter((a) => (a.loteId ? loteIds.has(a.loteId) : at.has('corte')));
+  const ids = new Set<Id>(animais.map((a) => a.id));
+  const tem = (id?: Id) => !!id && ids.has(id);
+
+  const idx = indexarPesagens(e.pesagens);
+  const ua = (xs: typeof e.animais) => xs.filter((a) => a.status === 'ativo').reduce((s, a) => s + uaDe(pesoAtual(a, idx.get(a.id), hoje)), 0);
+  const fator = Math.max(0.1, Math.min(1, ua(animais) / Math.max(1, ua(e.animais))));
+
+  const lancFora = new Set(e.lancamentos.filter((l) => l.atividade !== 'geral' && !at.has(l.atividade)).map((l) => l.id));
+  const lancamentos = e.lancamentos
+    .filter((l) => !lancFora.has(l.id) && !(l.baixaDe && lancFora.has(l.baixaDe)))
+    .map((l) => (l.atividade === 'geral' && !l.credito.startsWith('3.') ? { ...l, valor: Math.round(l.valor * fator * 100) / 100 } : l));
+
+  const insumoAtiv: [RegExp, string[]][] = [
+    [/confinamento|proteinado/i, ['corte']],
+    [/lactação|silagem/i, ['leite', 'corte']],
+  ];
+  const insumos = e.insumos.filter((i) => {
+    const regra = insumoAtiv.find(([re]) => re.test(i.nome));
+    return !regra || regra[1].some((a) => at.has(a));
+  });
+  const insIds = new Set(insumos.map((i) => i.id));
+
+  const usaCorteOuGen = at.has('corte') || at.has('genetica');
+  const cotacoes = e.cotacoes.filter((c) =>
+    c.indicador === 'leite' ? at.has('leite') : c.indicador === 'milho' || c.indicador === 'soja' ? true : usaCorteOuGen);
+
+  const eventoFora = (t: string) => (!at.has('corte') && /confinamento|R1|boi/i.test(t)) || (!at.has('leite') && /laticínio|tanque|ordenha/i.test(t));
+
+  // Pastos: os ocupados pelos lotes que ficam, mais um em descanso para cada
+  // um deles (rotação). A área da fazenda acompanha, com 25% de reserva.
+  const lotesComPasto = new Set(lotes.map((l) => l.piqueteId).filter(Boolean) as string[]);
+  const livres = e.piquetes.filter((p) => !lotesComPasto.has(p.id) && !e.lotes.some((l) => l.piqueteId === p.id));
+  const extras = livres.filter((p) => p.status !== 'reforma').sort((a, b) => a.areaHa - b.areaHa).slice(0, 1);
+  const piquetes = e.piquetes.filter((p) => lotesComPasto.has(p.id) || extras.includes(p));
+  const fazenda = { ...e.fazenda, areaTotalHa: Math.round(piquetes.reduce((s, p) => s + p.areaHa, 0) * 1.25) };
+
+  return {
+    ...e,
+    modulos: { ...modulos, core: true },
+    fazenda, lotes, animais, piquetes, lancamentos, insumos, cotacoes,
+    pesagens: e.pesagens.filter((p) => tem(p.animalId)),
+    movimentacoes: e.movimentacoes.map((m) => ({ ...m, animalIds: m.animalIds.filter(tem) })).filter((m) => m.animalIds.length),
+    ocorrencias: e.ocorrencias.filter((o) => tem(o.animalId)),
+    sanidade: e.sanidade.map((s) => ({ ...s, animalIds: s.animalIds.filter(tem) })).filter((s) => s.animalIds.length),
+    movEstoque: e.movEstoque.filter((m) => insIds.has(m.insumoId)).map((m) => (m.tipo === 'saida' ? { ...m, quantidade: Math.round(m.quantidade * fator) } : m)),
+    eventos: e.eventos.filter((ev) => !eventoFora(ev.titulo)),
+    documentos: e.documentos.filter((d) => at.has('corte') || !['GTA', 'NF Produtor'].includes(d.tipo)),
+    pessoas: e.pessoas.filter((p) => p.funcao !== 'ordenhador' || at.has('leite')),
+    dietas: at.has('corte') ? e.dietas : [],
+    leiturasCocho: e.leiturasCocho.filter((l) => loteIds.has(l.loteId)),
+    vendas: e.vendas.map((v) => ({ ...v, animalIds: v.animalIds.filter(tem) })).filter((v) => v.animalIds.length),
+    ordenhas: e.ordenhas.filter((o) => tem(o.animalId)),
+    analisesLeite: at.has('leite') ? e.analisesLeite : [],
+    mastites: e.mastites.filter((m) => tem(m.animalId)),
+    reproducao: e.reproducao.filter((r) => tem(r.animalId)),
+    avaliacoes: e.avaliacoes.filter((a) => tem(a.animalId)),
+    provas: e.provas.filter((p) => tem(p.animalId)),
+    estoqueGenetico: e.estoqueGenetico.filter((g) => at.has('genetica')
+      || (at.has('leite') && /gir|girolando/i.test(g.identificacao))
+      || (at.has('corte') && !g.touroId && /nelore/i.test(g.identificacao))),
+    acasalamentos: e.acasalamentos.filter((a) => tem(a.vacaId)),
+    anuncios: e.anuncios.filter((a) => tem(a.animalId)),
+  };
 }

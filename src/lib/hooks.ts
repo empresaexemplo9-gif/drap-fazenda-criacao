@@ -4,7 +4,8 @@ import { useMemo } from 'react';
 import { useEstado } from './store';
 import { hojeISO } from './datas';
 import { indexarPesagens } from './domain/rebanho';
-import type { Animal, Lote, Piquete, Pessoa, Id } from './domain/types';
+import { atividadesAtivas } from './domain/modulos';
+import type { Animal, Lote, Piquete, Pessoa, Id, Atividade, ModuloId } from './domain/types';
 
 export function useHoje(): string {
   return useMemo(() => hojeISO(), []);
@@ -29,4 +30,18 @@ export function saudacao(): string {
   if (hour >= 5 && hour < 12) return 'Bom dia';
   if (hour >= 12 && hour < 18) return 'Boa tarde';
   return 'Boa noite';
+}
+
+/** Atividades contratadas e lotes que pertencem a elas. */
+export function usePerfil() {
+  const e = useEstado();
+  return useMemo(() => {
+    const atividades = atividadesAtivas(e.modulos);
+    const ativo = (a: Atividade | ModuloId) => a === 'geral' || a === 'core' || !!e.modulos[a as ModuloId];
+    const lotes = e.lotes.filter((l) => ativo(l.atividade));
+    const loteIds = new Set(lotes.map((l) => l.id));
+    /** Animal visível: no lote de uma atividade ativa, ou sem lote (vendidos, mortos). */
+    const animalVisivel = (a: Animal) => !a.loteId || loteIds.has(a.loteId);
+    return { atividades, ativo, lotes, loteIds, animalVisivel, so: atividades.length === 1 ? atividades[0] : null };
+  }, [e.modulos, e.lotes]);
 }

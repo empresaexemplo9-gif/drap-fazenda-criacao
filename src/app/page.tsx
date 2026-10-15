@@ -10,20 +10,21 @@
 import Link from 'next/link';
 import { useMemo } from 'react';
 import {
-  ArrowUpRight, CalendarCheck, Wallet, BarChart3, Beef, Milk, Dna, TriangleAlert, Sprout, Package, Scale, LineChart,
+  ArrowUpRight, CalendarCheck, Wallet, Beef, Milk, Dna, TriangleAlert, Sprout, Package, Scale, LineChart,
   ListChecks, Syringe, CalendarDays, Landmark, FileText, Users, Tractor, Calculator, ClipboardList,
 } from 'lucide-react';
 import { useEstado, salvar, novoId } from '@/lib/store';
 import { useHoje, useIndices, saudacao } from '@/lib/hooks';
 import { brl, isoToBrDate, num } from '@/lib/format';
-import { addDias, rotuloMes } from '@/lib/datas';
+import { addDias } from '@/lib/datas';
 import { posicao } from '@/lib/domain/livro-razao';
 import { sugestoes, sugestaoParaEvento, atrasados } from '@/lib/domain/calendario';
-import { carenciasAtivas, lotacaoPiquetes, conciliarCabecas, uaDe, pesoAtual, ativos } from '@/lib/domain/rebanho';
+import { carenciasAtivas, lotacaoPiquetes, conciliarCabecas, uaDe, pesoAtual, ativos, gmdGrupo } from '@/lib/domain/rebanho';
+import { situacaoQualidade, taxaPrenhez } from '@/lib/domain/leite';
 import { previsaoRuptura } from '@/lib/domain/estoque';
 import { custoPorLote, resumoCustos } from '@/lib/domain/custos';
 import { relacaoTroca } from '@/lib/domain/simulador';
-import { moduloAtivo } from '@/lib/domain/modulos';
+import { moduloAtivo, perfilDe } from '@/lib/domain/modulos';
 import { ROTAS } from '@/lib/rotas';
 import { ROT_EVENTO, TOM_EVENTO } from '@/lib/rotulos';
 import { Badge, Em } from '@/components/ui';
@@ -68,7 +69,18 @@ export default function Painel() {
     const boi = ultima('boi_gordo');
     const bez = ultima('bezerro');
     const leite = ultima('leite');
+    const doAt = (at: string) => vivos.filter((a) => a.loteId && ix.lote.get(a.loteId)?.atividade === at);
+    const corteAnimais = doAt('corte');
+    const vacasLact = vivos.filter((a) => a.loteId && ix.lote.get(a.loteId)?.fase === 'lactacao');
+    const ini7 = addDias(hoje, -6);
+    const leite7 = e.ordenhas.filter((o) => o.data >= ini7 && !o.descartado).reduce((s, o) => s + o.litros, 0) / 7;
+    const genIds = new Set(doAt('genetica').map((a) => a.id));
+    const avals = new Map(e.avaliacoes.filter((v) => genIds.has(v.animalId)).map((v) => [v.animalId, v]));
+    const tp = taxaPrenhez(e.reproducao.filter((r) => genIds.has(r.animalId)), addDias(hoje, -365), hoje);
     return {
+      corte: { cab: corteAnimais.length, gmd: gmdGrupo(corteAnimais.map((a) => a.id), ix.pesagens, addDias(hoje, -120), hoje) },
+      vacas: vacasLact.length, leite7, qual: situacaoQualidade(e.analisesLeite, hoje),
+      gen: { avaliados: avals.size, top10: [...avals.values()].filter((v) => (v.top ?? 100) <= 10).length, prenhez: tp.taxa, doses: e.estoqueGenetico.reduce((s, x) => s + x.doses, 0) },
       pos, pagarHoje, sugs, eventosHoje, sugsHoje, atras, carencias, superlotados, prontos, estoque, conc,
       vivos: vivos.length, ua, uaHa: areaPasto ? ua / areaPasto : 0, porAtividade, res, boi, bez, leite,
       troca: boi && bez ? relacaoTroca(boi.valor, 18, bez.valor) : null,
@@ -84,7 +96,7 @@ export default function Painel() {
   return (
     <div className="mx-auto max-w-reading">
       <section className="mb-10">
-        <span className="eyebrow text-earth">{saudacao()} · {operador?.nome.split(' ')[0] ?? 'bem-vindo'}</span>
+        <span className="eyebrow text-earth">{saudacao()} · {operador?.nome.split(' ')[0] ?? 'bem-vindo'} · {perfilDe(e.modulos)?.nome}</span>
         <h1 className="mt-2 font-display text-4xl font-semibold leading-tight tracking-tight text-ink sm:text-5xl">
           O que <Em tom="earth">precisa da sua atenção</Em> hoje.
         </h1>
@@ -228,16 +240,29 @@ export default function Painel() {
           <Linha label="A receber" value={brl(d.pos.aReceber)} positive />
           <Linha label="Líquido" value={`${d.pos.liquido < 0 ? '−' : d.pos.liquido > 0 ? '+' : ''}${brl(Math.abs(d.pos.liquido))}`} strong />
         </Resumo>
-        <Resumo eyebrow="Custo de produção · 90 dias" titulo="Quanto custou produzir" icon={<BarChart3 className="h-5 w-5 text-earth" strokeWidth={1.5} />} href="/custos/" link="Ver custos e rateio">
-          {moduloAtivo(e.modulos, 'corte') ? <Linha label="Custo da @ produzida" value={corte?.custoArroba != null ? brl(corte.custoArroba) : '—'} strong /> : null}
-          {moduloAtivo(e.modulos, 'corte') ? <Linha label="@ produzidas (corte)" value={num(corte?.arrobas, 1)} /> : null}
-          {moduloAtivo(e.modulos, 'leite') ? <Linha label="Custo do litro" value={leiteR?.custoLitro != null ? brl(leiteR.custoLitro) : '—'} strong /> : null}
-        </Resumo>
-        <Resumo eyebrow={`Mercado · ${d.boi ? rotuloMes(d.boi.data.slice(0, 7)) : ''}`} titulo={d.boi ? `Boi a ${brl(d.boi.valor)}/@` : 'Sem cotação'} icon={<LineChart className="h-5 w-5 text-earth" strokeWidth={1.5} />} href="/mercado/" link="Simular vender × segurar">
-          {d.bez ? <Linha label="Bezerro" value={`${brl(d.bez.valor)}/cab`} /> : null}
-          {d.troca != null ? <Linha label="Relação de troca (boi de 18 @)" value={`${num(d.troca)} bezerros`} strong /> : null}
-          {d.leite && moduloAtivo(e.modulos, 'leite') ? <Linha label="Leite" value={`${brl(d.leite.valor)}/L`} /> : null}
-        </Resumo>
+        {moduloAtivo(e.modulos, 'corte') ? (
+          <Resumo eyebrow="Módulo Corte" titulo={`${d.corte.cab} cabeças`} icon={<Tractor className="h-5 w-5 text-earth" strokeWidth={1.5} />} href="/corte/" link="Abrir Corte">
+            <Linha label="GMD · 120 dias" value={d.corte.gmd != null ? `${num(d.corte.gmd, 3)} kg/d` : '—'} />
+            <Linha label="Custo da @ produzida · 90 d" value={corte?.custoArroba != null ? brl(corte.custoArroba) : '—'} strong />
+            {d.boi ? <Linha label="Boi gordo" value={`${brl(d.boi.valor)}/@`} positive /> : null}
+            {d.troca != null ? <Linha label="Relação de troca" value={`${num(d.troca)} bezerros`} /> : null}
+          </Resumo>
+        ) : null}
+        {moduloAtivo(e.modulos, 'leite') ? (
+          <Resumo eyebrow="Módulo Leite" titulo={`${num(d.leite7, 0)} L/dia no tanque`} icon={<Milk className="h-5 w-5 text-earth" strokeWidth={1.5} />} href="/leite/" link="Abrir Leite">
+            <Linha label="Vacas em lactação" value={`${d.vacas}`} />
+            <Linha label="CCS · média 3 meses" value={d.qual.ccsMg != null ? `${num(d.qual.ccsMg, 0)} mil` : '—'} />
+            <Linha label="Custo do litro · 90 d" value={leiteR?.custoLitro != null ? brl(leiteR.custoLitro) : '—'} strong />
+            {d.leite ? <Linha label="Preço do litro" value={brl(d.leite.valor)} positive /> : null}
+          </Resumo>
+        ) : null}
+        {moduloAtivo(e.modulos, 'genetica') ? (
+          <Resumo eyebrow="Módulo Genética" titulo={`${d.gen.avaliados} animais avaliados`} icon={<Dna className="h-5 w-5 text-earth" strokeWidth={1.5} />} href="/genetica/" link="Abrir Genética">
+            <Linha label="TOP 10%" value={`${d.gen.top10}`} />
+            <Linha label="Taxa de prenhez · 12 m" value={d.gen.prenhez != null ? `${num(d.gen.prenhez, 1)}%` : '—'} strong />
+            <Linha label="Doses e embriões no botijão" value={`${d.gen.doses}`} />
+          </Resumo>
+        ) : null}
       </section>
 
       {/* ===== MÓDULOS ===== */}

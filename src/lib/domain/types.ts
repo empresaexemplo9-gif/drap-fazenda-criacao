@@ -496,6 +496,8 @@ export interface Estado extends Colecoes {
   modulos: Record<ModuloId, boolean>;
   contas: Conta[];
   tabelaLaticinio: TabelaLaticinio;
+  /** O produtor já escolheu as atividades no primeiro acesso. */
+  perfilDefinido?: boolean;
   /** Pessoa que está usando o aparelho agora (assina os registros). */
   operadorId?: Id;
   pendentes: Pendente[];
