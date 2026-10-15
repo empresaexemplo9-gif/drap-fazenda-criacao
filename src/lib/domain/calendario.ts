@@ -11,6 +11,7 @@
 import { addDias, diasEntre, idadeMeses } from '../datas';
 import { carenciasAtivas } from './rebanho';
 import { previsaoRuptura } from './estoque';
+import { tipoTitulo } from './livro-razao';
 import type {
   Estado, Evento, TipoEvento, ISODate, Id,
 } from './types';
@@ -101,17 +102,24 @@ export function sugestoes(e: Estado, hoje: ISODate, horizonteDias = 60): Sugesta
     });
   }
 
-  // ---- Fim de carência (liberação para abate / leite)
+  // ---- Fim de carência (liberação para abate / leite), agrupado por produto e data
+  const grupos = new Map<string, { produto: string; data: ISODate; carne: boolean; leite: boolean; ids: Id[] }>();
   for (const c of carenciasAtivas(e.sanidade, hoje)) {
-    const a = e.animais.find((x) => x.id === c.animalId);
-    if (!a) continue;
     const data = c.bloqueiaCarne ? c.liberaCarne : c.liberaLeite;
     if (data > limite) continue;
+    const k = `${c.produto}|${data}`;
+    const g = grupos.get(k) ?? { produto: c.produto, data, carne: false, leite: false, ids: [] };
+    g.carne ||= c.bloqueiaCarne; g.leite ||= c.bloqueiaLeite; g.ids.push(c.animalId);
+    grupos.set(k, g);
+  }
+  for (const g of grupos.values()) {
+    const um = g.ids.length === 1 ? e.animais.find((x) => x.id === g.ids[0]) : undefined;
     out.push({
-      regra: `carencia:${c.animalId}:${data}`,
-      titulo: `Fim da carência de ${a.brinco} (${c.produto})`, data, tipo: 'sanitario',
-      detalhe: `${c.bloqueiaCarne ? 'Bloqueado para abate' : ''}${c.bloqueiaCarne && c.bloqueiaLeite ? ' e ' : ''}${c.bloqueiaLeite ? 'leite descartado' : ''} até esta data.`,
-      animalIds: [c.animalId], prioridade: 'baixa',
+      regra: `carencia:${g.produto}:${g.data}`,
+      titulo: um ? `Fim da carência de ${um.brinco} (${g.produto})` : `Fim da carência de ${g.ids.length} animais (${g.produto})`,
+      data: g.data, tipo: 'sanitario',
+      detalhe: `${g.carne ? 'Bloqueados para abate' : ''}${g.carne && g.leite ? ' e ' : ''}${g.leite ? 'leite descartado' : ''} até esta data.`,
+      animalIds: g.ids, prioridade: 'baixa',
     });
   }
 
@@ -187,7 +195,7 @@ export function sugestoes(e: Estado, hoje: ISODate, horizonteDias = 60): Sugesta
 
   // ---- Títulos a pagar do livro-razão
   for (const l of e.lancamentos) {
-    if (!l.credito.startsWith('2.') || l.pagoEm || l.baixaDe || !l.vencimento) continue;
+    if (tipoTitulo(l) !== 'pagar' || l.pagoEm || !l.vencimento) continue;
     if (l.vencimento > limite) continue;
     out.push({
       regra: `pagar:${l.id}`, titulo: `Pagar ${l.historico}`, data: l.vencimento, tipo: 'pagamento',

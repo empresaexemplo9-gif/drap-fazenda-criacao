@@ -51,7 +51,11 @@ function emitir() {
 }
 
 function obter(): Estado {
-  if (!estado) estado = carregar();
+  if (!estado) {
+    estado = carregar();
+    // grava a demo na primeira abertura: o histórico não muda a cada recarga
+    if (typeof window !== 'undefined') persistir();
+  }
   return estado;
 }
 

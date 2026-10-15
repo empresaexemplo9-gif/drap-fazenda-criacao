@@ -249,11 +249,15 @@ describe('calendário e custos na demo', () => {
     expect(conf.arrobasProduzidas).toBeGreaterThan(0);
     expect(conf.custoPorArroba).toBeGreaterThan(0);
   });
-  it('arrobas produzidas = ganho × rendimento / 15', () => {
+  it('arrobas produzidas = GMD × dias no período × rendimento / 15', () => {
     const p: Pesagem[] = [
       { id: '1', animalId: 'a', data: '2026-08-01', pesoKg: 400, metodo: 'balanca' },
       { id: '2', animalId: 'a', data: '2026-10-01', pesoKg: 490, metodo: 'balanca' },
     ];
-    expect(arrobasProduzidas(['a'], p, '2026-07-01', HOJE, 50)).toBe(3);
+    const boi: Animal = { id: 'a', brinco: '1', sexo: 'M', raca: 'Nelore', nascimento: '2024-08-01', origem: 'nascido', status: 'ativo' };
+    // GMD 90/61 kg/dia durante 61 dias = 90 kg → 90 × 0,5 / 15 = 3 @
+    expect(arrobasProduzidas([boi], p, '2026-08-01', '2026-10-01', 50)).toBeCloseTo(3, 6);
+    // animal que entrou no meio do período só conta os dias presentes
+    expect(arrobasProduzidas([{ ...boi, dataEntrada: '2026-09-01' }], p, '2026-08-01', '2026-10-01', 50)).toBeCloseTo(3 * 30 / 61, 6);
   });
 });

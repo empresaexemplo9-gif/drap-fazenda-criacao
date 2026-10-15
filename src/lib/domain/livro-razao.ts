@@ -230,10 +230,15 @@ export function dre(ls: Lancamento[], contas: Conta[], de: ISODate, ate: ISODate
 
 export type TipoTitulo = 'pagar' | 'receber';
 
-/** Título em aberto: lançamento de competência contra Fornecedores ou Clientes, ainda sem baixa. */
+/**
+ * Título em aberto: lançamento de competência contra o passivo circulante
+ * (fornecedores, salários, Funrural) ou contra Clientes, ainda sem baixa.
+ * Crédito rural (2.2) é dívida de longo prazo: suas parcelas entram como
+ * títulos próprios quando vencem.
+ */
 export function tipoTitulo(l: Lancamento): TipoTitulo | null {
-  if (l.baixaDe) return null;
-  if (l.credito.startsWith('2.')) return 'pagar';
+  if (l.baixaDe || l.previsto) return null;
+  if (l.credito.startsWith('2.1.')) return 'pagar';
   if (l.debito === CONTA_CLIENTES) return 'receber';
   return null;
 }

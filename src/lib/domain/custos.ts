@@ -12,6 +12,8 @@ import { realizados } from './livro-razao';
 import { KG_POR_ARROBA, uaDe, pesoAtual, indexarPesagens } from './rebanho';
 import type { Animal, Conta, Lancamento, Lote, Pesagem, Ordenha, Atividade, ISODate, Id } from './types';
 
+const FASES_SEM_ARROBA = ['reprodutores', 'doadoras', 'receptoras', 'lactacao', 'seca'];
+
 export type CriterioRateio = 'ua_dia' | 'cabecas' | 'igual';
 
 export interface CustoLote {
@@ -55,14 +57,26 @@ export function uaDiaPorLote(lotes: Lote[], animais: Animal[], pesagens: Pesagem
   return out;
 }
 
-/** Arrobas de carcaça produzidas pelo lote no período. */
-export function arrobasProduzidas(ids: Id[], pesagens: Pesagem[], de: ISODate, ate: ISODate, rendimentoPct: number): number {
+/**
+ * Arrobas de carcaça produzidas no período. Como as pesagens são esparsas
+ * (a cada 30–90 dias), o ganho é estimado pelo GMD de cada animal (pesagens
+ * de até 120 dias antes do período) multiplicado pelos dias em que ele
+ * esteve na fazenda dentro do período.
+ */
+export function arrobasProduzidas(animais: Animal[], pesagens: Pesagem[], de: ISODate, ate: ISODate, rendimentoPct: number): number {
   const idx = indexarPesagens(pesagens);
+  const janelaIni = addDias(de, -120);
   let ganhoKg = 0;
-  for (const id of ids) {
-    const hist = (idx.get(id) ?? []).filter((p) => p.data >= de && p.data <= ate);
+  for (const a of animais) {
+    const hist = (idx.get(a.id) ?? []).filter((p) => p.data >= janelaIni && p.data <= ate);
     if (hist.length < 2) continue;
-    ganhoKg += hist[hist.length - 1].pesoKg - hist[0].pesoKg;
+    const dHist = diasEntre(hist[0].data, hist[hist.length - 1].data);
+    if (dHist < 7) continue;
+    const g = (hist[hist.length - 1].pesoKg - hist[0].pesoKg) / dHist;
+    const ini = [de, a.dataEntrada ?? a.nascimento].sort()[1];
+    const fim = a.dataSaida && a.dataSaida < ate ? a.dataSaida : ate;
+    const dias = Math.max(0, diasEntre(ini, fim));
+    ganhoKg += g * dias;
   }
   return Math.max(0, (ganhoKg * (rendimentoPct / 100)) / KG_POR_ARROBA);
 }
@@ -108,14 +122,15 @@ export function custoPorLote(
     const pa = pesoAtiv(lote.atividade);
     const rateado = (totalPeso > 0 ? (comum * p) / totalPeso : 0) + (pa > 0 ? (daAtividade * p) / pa : 0);
     const total = direto + rateado;
-    const ids = animais.filter((a) => a.loteId === lote.id).map((a) => a.id);
-    const arrobas = lote.atividade === 'leite' ? 0 : arrobasProduzidas(ids, pesagens, de, ate, rendimentoPct);
+    const doLote = animais.filter((a) => a.loteId === lote.id);
+    const arrobas = lote.atividade === 'leite' ? 0 : arrobasProduzidas(doLote, pesagens, de, ate, rendimentoPct);
     const b = base.get(lote.id)!;
     const cabecasMedias = b.cabDia / dias;
     return {
       lote, direto, rateado, total, uaDia: b.uaDia, cabecasMedias,
       arrobasProduzidas: arrobas,
-      custoPorArroba: arrobas > 0 ? total / arrobas : null,
+      // Reprodutores e doadoras não existem para ganhar peso: custo por @ não se aplica.
+      custoPorArroba: arrobas >= 1 && !FASES_SEM_ARROBA.includes(lote.fase) ? total / arrobas : null,
       custoCabecaMes: cabecasMedias > 0 ? (total / cabecasMedias) / (dias / 30.4375) : null,
     };
   });

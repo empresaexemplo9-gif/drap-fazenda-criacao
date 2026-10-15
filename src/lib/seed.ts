@@ -10,8 +10,8 @@ import { addDias, addMeses, safraDe } from './datas';
 import { PLANO_PADRAO, CONTA_BANCO, CONTA_FORNECEDORES, CONTA_CLIENTES } from './domain/livro-razao';
 import type {
   Animal, Estado, Lote, Piquete, Pesagem, AplicacaoSanitaria, Insumo, MovEstoque, Lancamento,
-  Evento, Documento, Pessoa, Cotacao, Dieta, LeituraCocho, VendaAbate, Ordenha, AnaliseLeite,
-  CasoMastite, EventoReprodutivo, AvaliacaoGenetica, ProvaDesempenho, EstoqueGenetico, Acasalamento,
+  Evento, Pessoa, Cotacao, Dieta, LeituraCocho, VendaAbate, Ordenha, AnaliseLeite,
+  CasoMastite, EventoReprodutivo, AvaliacaoGenetica, ProvaDesempenho, Acasalamento,
   Anuncio, Atividade, Fase, Sexo, ISODate, Ocorrencia,
 } from './domain/types';
 
@@ -268,8 +268,8 @@ export function estadoDemo(hoje: ISODate): Estado {
   e.movEstoque = [
     mov(I.sal, 90, 'entrada', 6000, 3.55, '48211'), mov(I.sal, 60, 'saida', 1900), mov(I.sal, 30, 'saida', 1850), mov(I.sal, 5, 'saida', 400),
     mov(I.proteinado, 75, 'entrada', 12000, 2.35, '48390'), mov(I.proteinado, 40, 'saida', 5400), mov(I.proteinado, 10, 'saida', 4800),
-    mov(I.racao, 62, 'entrada', 40000, 1.12, '155101'), mov(I.racao, 31, 'entrada', 36000, 1.16, '155307'), mov(I.racao, 31, 'saida', 35000), mov(I.racao, 1, 'saida', 33000),
-    mov(I.concentrado, 30, 'entrada', 5000, 2.05, '7781'), mov(I.concentrado, 1, 'saida', 4700),
+    mov(I.racao, 62, 'entrada', 40000, 1.12, '155101'), mov(I.racao, 31, 'entrada', 36000, 1.16, '155307'), mov(I.racao, 31, 'saida', 35000), mov(I.racao, 1, 'saida', 28000),
+    mov(I.concentrado, 30, 'entrada', 5000, 2.05, '7781'), mov(I.concentrado, 1, 'saida', 4200),
     mov(I.silagem, 200, 'entrada', 420000, 0.3, 'Produção própria'), mov(I.silagem, 1, 'saida', 260000),
     mov(I.vacina, 340, 'entrada', 400, 1.9), mov(I.vacina, 330, 'saida', 260),
     mov(I.ivermec, 70, 'entrada', 1000, 0.42), mov(I.ivermec, 60, 'saida', 520),
@@ -286,7 +286,7 @@ export function estadoDemo(hoje: ISODate): Estado {
   };
   const d = (dias: number) => addDias(hoje, dias);
   // capital inicial e crédito rural
-  L_({ data: d(-200), historico: 'Saldo inicial de abertura do livro', debito: CONTA_BANCO, credito: '3.1.01', valor: 850000, atividade: 'geral' });
+  L_({ data: d(-230), historico: 'Saldo inicial de abertura do livro', debito: CONTA_BANCO, credito: '3.1.01', valor: 850000, atividade: 'geral' });
   L_({ data: d(-180), historico: 'Liberação custeio pecuário · Banco do Produtor', debito: CONTA_BANCO, credito: '2.2.01', valor: 400000, atividade: 'corte', formaPgto: 'CREDITO RURAL' });
   // reposição comprada
   for (const f of fornecedoresRep) {
@@ -299,13 +299,13 @@ export function estadoDemo(hoje: ISODate): Estado {
     const base = addMeses(hoje, -m).slice(0, 8);
     const dia = (n: number) => `${base}${String(n).padStart(2, '0')}`;
     if (dia(5) <= hoje) {
-      L_({ data: dia(5), historico: 'Folha de pagamento e encargos', debito: '5.2.01', credito: CONTA_BANCO, valor: 21800, atividade: 'geral', formaPgto: 'TRANSFER' });
+      L_({ data: dia(5), historico: 'Folha de pagamento e encargos', debito: '5.2.01', credito: CONTA_BANCO, valor: 14500, atividade: 'geral', formaPgto: 'TRANSFER' });
       L_({ data: dia(10), historico: 'Energia elétrica · ordenha e resfriador', debito: '5.2.04', credito: CONTA_BANCO, valor: Math.round(between(2600, 3300) * 100) / 100, atividade: 'leite', fornecedor: 'Energia Rural', formaPgto: 'BOLETO' });
-      L_({ data: dia(12), historico: 'Diesel S10 · tratores e vagão', debito: '5.2.02', credito: CONTA_BANCO, valor: Math.round(between(9000, 13500) * 100) / 100, atividade: 'geral', fornecedor: 'Posto Rodovia', formaPgto: 'PIX' });
-      L_({ data: dia(15), historico: 'Sal mineral e proteinado', debito: '5.1.01', credito: CONTA_BANCO, valor: Math.round(between(14000, 22000) * 100) / 100, atividade: 'corte', fornecedor: 'Nutrição Cerrado', formaPgto: 'BOLETO' });
+      L_({ data: dia(12), historico: 'Diesel S10 · tratores e vagão', debito: '5.2.02', credito: CONTA_BANCO, valor: Math.round(between(5500, 7500) * 100) / 100, atividade: 'geral', fornecedor: 'Posto Rodovia', formaPgto: 'PIX' });
+      L_({ data: dia(15), historico: 'Sal mineral e proteinado', debito: '5.1.01', credito: CONTA_BANCO, valor: Math.round(between(9000, 12000) * 100) / 100, atividade: 'corte', fornecedor: 'Nutrição Cerrado', formaPgto: 'BOLETO' });
       L_({ data: dia(18), historico: 'Concentrado vacas em lactação', debito: '5.1.02', credito: CONTA_BANCO, valor: Math.round(between(9000, 11000) * 100) / 100, atividade: 'leite', loteId: L.lactacao.id, fornecedor: 'Nutrição Cerrado', formaPgto: 'BOLETO' });
       L_({ data: dia(20), historico: 'Assistência veterinária mensal', debito: '5.2.06', credito: CONTA_BANCO, valor: 3500, atividade: 'geral', fornecedor: 'Dr. Paulo Mendes', formaPgto: 'PIX' });
-      L_({ data: dia(28), historico: 'Depreciação mensal de máquinas e benfeitorias', debito: '5.2.07', credito: '1.3.01', valor: 6200, atividade: 'geral' });
+      L_({ data: dia(28), historico: 'Depreciação mensal de máquinas e benfeitorias', debito: '5.2.07', credito: '1.3.01', valor: 3800, atividade: 'geral' });
     }
     if (m >= 1 && dia(8) <= hoje) {
       const litros = Math.round(between(10500, 12500));
@@ -313,14 +313,14 @@ export function estadoDemo(hoje: ISODate): Estado {
     }
   }
   // confinamento: ração a prazo (2 notas, uma vence hoje — "pagamentos do dia")
-  L_({ data: d(-62), historico: 'Ração dieta total · NF 155101', debito: '5.1.02', credito: CONTA_BANCO, valor: 44800, atividade: 'corte', loteId: L.conf.id, fornecedor: 'Cereal Rações', nota: '155101', formaPgto: 'BOLETO' });
-  L_({ data: d(-31), historico: 'Ração dieta total · NF 155307', debito: '5.1.02', credito: CONTA_FORNECEDORES, valor: 41760, atividade: 'corte', loteId: L.conf.id, fornecedor: 'Cereal Rações', nota: '155307', formaPgto: 'A PAGAR', vencimento: hoje });
+  L_({ data: d(-62), historico: 'Ração dieta total · NF 155101', debito: '5.1.02', credito: CONTA_BANCO, valor: 24800, atividade: 'corte', loteId: L.conf.id, fornecedor: 'Cereal Rações', nota: '155101', formaPgto: 'BOLETO' });
+  L_({ data: d(-31), historico: 'Ração dieta total · NF 155307', debito: '5.1.02', credito: CONTA_FORNECEDORES, valor: 26150, atividade: 'corte', loteId: L.conf.id, fornecedor: 'Cereal Rações', nota: '155307', formaPgto: 'A PAGAR', vencimento: hoje });
   L_({ data: d(-4), historico: 'Óleo 20W50 e filtros · NF 264454', debito: '5.2.03', credito: CONTA_FORNECEDORES, valor: 160.46, atividade: 'geral', fornecedor: 'Casa do Fazendeiro', nota: '264454', formaPgto: 'A PAGAR', vencimento: hoje });
   L_({ data: d(-6), historico: 'Medicamentos · NF 88120', debito: '5.1.03', credito: CONTA_FORNECEDORES, valor: 2380.9, atividade: 'geral', fornecedor: 'Agrovet Rio Verde', nota: '88120', formaPgto: 'A PAGAR', vencimento: d(-1) });
   L_({ data: d(-2), historico: 'Silagem: frete do milho', debito: '5.1.07', credito: CONTA_FORNECEDORES, valor: 6400, atividade: 'leite', fornecedor: 'Transportes JR', formaPgto: 'A PAGAR', vencimento: d(9) });
   L_({ data: d(-10), historico: 'Sêmen sexado · 40 doses', debito: '5.1.04', credito: CONTA_FORNECEDORES, valor: 6800, atividade: 'leite', fornecedor: 'Central Genética Brasil', formaPgto: 'A PAGAR', vencimento: d(20) });
-  L_({ data: d(-1), historico: 'Adubação de cobertura · Piquetes 3 e 5', debito: '5.2.05', credito: CONTA_FORNECEDORES, valor: 28400, atividade: 'geral', fornecedor: 'Fertilizantes Goiás', formaPgto: 'A PAGAR', vencimento: d(27) });
-  L_({ data: d(-3), historico: 'Juros e parcela do custeio pecuário', debito: '5.3.03', credito: '2.1.01', valor: 18600, atividade: 'corte', fornecedor: 'Banco do Produtor', formaPgto: 'A PAGAR', vencimento: d(45) });
+  L_({ data: d(-1), historico: 'Adubação de cobertura · Piquetes 3 e 5', debito: '5.2.05', credito: CONTA_FORNECEDORES, valor: 12400, atividade: 'geral', fornecedor: 'Fertilizantes Goiás', formaPgto: 'A PAGAR', vencimento: d(27) });
+  L_({ data: d(-3), historico: 'Juros e parcela do custeio pecuário', debito: '5.3.03', credito: '2.1.01', valor: 9600, atividade: 'corte', fornecedor: 'Banco do Produtor', formaPgto: 'A PAGAR', vencimento: d(45) });
   L_({ data: d(-40), historico: 'ITR 2026 · cota única', debito: '5.3.02', credito: CONTA_BANCO, valor: 4120, atividade: 'geral', formaPgto: 'BOLETO' });
 
   // vendas para frigorífico (receita + Funrural)
@@ -462,14 +462,19 @@ export function estadoDemo(hoje: ISODate): Estado {
   ];
 
   // ---------------- Genética ----------------
-  const aval = (a: Animal, deps: Record<string, number>, indice: number, top: number, acuracia = 0.7): AvaliacaoGenetica =>
-    ({ id: id('g'), animalId: a.id, programa: 'PMGRN', safra: '2026', deps, indice, top, acuracia, em });
+  const r2 = (x: number) => Math.round(x * 100) / 100;
+  /** TOP coerente com o MGT (quanto maior o mérito, menor o percentil). */
+  const aval = (a: Animal, deps: Record<string, number>, indice: number, top: number, acuracia = 0.7): AvaliacaoGenetica => {
+    const d = Object.fromEntries(Object.entries(deps).map(([k, v]) => [k, r2(v)]));
+    const t = top > 0 ? top : Math.max(1, Math.min(50, Math.round(48 - d.MGT * 5.5)));
+    return { id: id('g'), animalId: a.id, programa: 'PMGRN', safra: '2026', deps: d, indice: r2(indice), top: t, acuracia, em };
+  };
   e.avaliacoes = [
     aval(t1, { PN: 0.8, P120: 4.1, P210: 7.9, P365: 11.2, P450: 14.5, PE: 1.1, AOL: 1.9, EGS: 0.3, MGT: 6.8 }, 118.4, 3, 0.82),
     aval(t2, { PN: 0.4, P120: 3.2, P210: 6.4, P365: 9.8, P450: 12.1, PE: 0.8, AOL: 2.6, EGS: 0.5, MGT: 5.2 }, 112.7, 7, 0.76),
     aval(avos[0], { PN: 1.1, P120: 3.6, P210: 6.9, P365: 9.7, P450: 12.6, PE: 0.9, AOL: 1.2, EGS: 0.1, MGT: 7.4 }, 110.1, 10, 0.9),
-    ...doadoras.map((dd, i) => aval(dd, { PN: between(-0.2, 0.9), P120: between(1.5, 4), P210: between(3, 7.5), P365: between(5, 11), P450: between(6, 13), PE: between(0.2, 1), AOL: between(0.5, 2.5), EGS: between(0, 0.5), MGT: between(3, 8) }, between(102, 116), [5, 8, 12, 15, 20, 25, 30][i], 0.6)),
-    ...tourinhos.map((tt) => aval(tt, { PN: between(0, 1), P120: between(2, 4.5), P210: between(4, 8), P365: between(6, 12), P450: between(8, 15), PE: between(0.3, 1.3), AOL: between(0.8, 2.8), EGS: between(0, 0.6), MGT: between(4, 8) }, between(100, 120), int(2, 40), 0.45)),
+    ...doadoras.map((dd, i) => aval(dd, { PN: between(-0.2, 0.9), P120: between(1.5, 4), P210: between(3, 7.5), P365: between(5, 11), P450: between(6, 13), PE: between(0.2, 1), AOL: between(0.5, 2.5), EGS: between(0, 0.5), MGT: between(3, 8) }, between(102, 116), 0, 0.6)),
+    ...tourinhos.map((tt) => aval(tt, { PN: between(0, 1), P120: between(2, 4.5), P210: between(4, 8), P365: between(6, 12), P450: between(8, 15), PE: between(0.3, 1.3), AOL: between(0.8, 2.8), EGS: between(0, 0.6), MGT: between(4, 8) }, between(100, 120), 0, 0.45)),
   ];
   e.provas = tourinhos.map((tt): ProvaDesempenho => ({
     id: id('pv'), animalId: tt.id, data: d(-8), grupo: `PO · machos · safra ${hoje.slice(0, 4)}`,

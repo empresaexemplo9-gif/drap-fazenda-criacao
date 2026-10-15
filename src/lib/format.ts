@@ -42,11 +42,13 @@ export function isoToBrDate(iso: string): string {
 
 const numFormatter = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 });
 const num1Formatter = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const num0Formatter = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 0 });
 const num3Formatter = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
 
 /** Número com até 2 casas, padrão BR. */
-export function num(value: number | null | undefined, casas?: 1 | 3): string {
+export function num(value: number | null | undefined, casas?: 0 | 1 | 3): string {
   if (value == null || !Number.isFinite(value)) return '—';
+  if (casas === 0) return num0Formatter.format(value);
   if (casas === 1) return num1Formatter.format(value);
   if (casas === 3) return num3Formatter.format(value);
   return numFormatter.format(value);
