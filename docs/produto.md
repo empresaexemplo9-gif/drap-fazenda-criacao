@@ -19,6 +19,7 @@ Documento para a revisão dos sócios. Ele cruza cada dor levantada com o que j�
 | Crédito rural | Contas 2.2 (custeio e investimento), parcelas como títulos | Lançamentos | 🟡 cronograma de parcelas automático no roteiro |
 | Documentação e conformidade | GTA, NF do produtor, Funrural calculado sobre a receita bruta, CAR, ITR, CCIR e licenças com vencimento na agenda | Documentos | 🟡 emissão de GTA/NF-e integrada no roteiro |
 | Gestão de pessoas e rotatividade | Cada registro assina quem anotou. Apontamentos por pessoa e escala de turnos | Equipe | ✅ · 🔜 login por pessoa (servidor) |
+| Rebanho já controlado em planilha | Sincronização nos dois sentidos com Google Planilhas (automática) ou Excel (offline), reconhecendo o mesmo animal, lote, documento ou lançamento pelo brinco, RFID, nome, código ou número | Planilha | ✅ |
 | Conectividade ruim | App estático com service worker: abre sem sinal, grava no aparelho e mostra a fila de pendências. Backup em JSON | Todo o app | ✅ local · 🟡 servidor de sincronização (schema pronto) |
 | Estoque de insumos | Saldo, custo médio ponderado, previsão de ruptura pelo consumo diário, conferência do consumo de sal por UA, entrada que já lança a despesa a prazo | Estoque | ✅ |
 | Clima e preço de mercado | Cotações (boi, vaca, bezerro, leite, milho), relação de troca, **simulador vender × segurar** com @ de equilíbrio, **confinar × pasto** | Mercado | ✅ cotação manual · 🔜 Cepea/B3 e clima |
@@ -89,7 +90,7 @@ Preços de referência usados na tela (hipóteses a validar na feira): núcleo R
 
 1. **Piloto (agora):** núcleo + Corte com 3 a 5 pecuaristas. App local com backup semanal.
 2. **Sincronização:** publicar o `supabase/migrations/001_sincronizacao.sql`, um endpoint que chama `aplicar_pendencias` e o login por pessoa, com permissão do livro-razão só para proprietário e gerente.
-3. **Integrações:** balança e bastão RFID por Bluetooth, importação de planilha, exportação contábil (o CSV de lançamentos já sai no formato com `;` para o ContábilPro), cotações Cepea e B3.
+3. **Integrações:** balança e bastão RFID por Bluetooth, mais abas na planilha (sanidade, ordenhas, reprodução), exportação contábil (o CSV de lançamentos já sai no formato com `;` para o ContábilPro), cotações Cepea e B3.
 4. **Leite:** importar as análises do laticínio, checklist da IN 77 e balanceamento.
 5. **Genética premium:** associações de raça, FIV/TE completas, vitrine pública e leilões.
 6. **Conformidade:** emissão de GTA via órgão estadual e NF-e do produtor reaproveitando o emissor do DRAP Fazenda.

@@ -14,7 +14,7 @@ import { useSyncExternalStore } from 'react';
 import { estadoDemo, estadoVazio, VERSAO_ESTADO } from './seed';
 import { podeDesativar } from './domain/modulos';
 import { hojeISO } from './datas';
-import type { Colecoes, Estado, Fazenda, Id, ModuloId, Pendente } from './domain/types';
+import type { Colecoes, ConfigPlanilha, Estado, Fazenda, Id, ModuloId, Pendente } from './domain/types';
 
 const CHAVE = 'drap-pecuaria:estado:v1';
 
@@ -203,6 +203,49 @@ export function importarJSON(texto: string): { ok: true } | { ok: false; erro: s
   } catch (err) {
     return { ok: false, erro: `Não consegui ler o arquivo: ${String(err)}` };
   }
+}
+
+// ===================== PLANILHA =====================
+
+export function configPlanilhaPadrao(): ConfigPlanilha {
+  const bytes = new Uint8Array(18);
+  crypto.getRandomValues(bytes);
+  const token = Array.from(bytes, (b) => 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789'[b % 56]).join('');
+  return { token, abas: ['lotes', 'animais', 'pesagens'], politica: 'planilha', automatica: true, base: {}, baseArquivo: {}, historico: [] };
+}
+
+export function definirPlanilha(patch: Partial<ConfigPlanilha>) {
+  const e = obter();
+  definir({ ...e, planilha: { ...(e.planilha ?? configPlanilhaPadrao()), ...patch } });
+}
+
+/**
+ * Grava no aparelho o que veio da planilha. Cada registro novo ou alterado
+ * entra na fila de pendências, como qualquer anotação feita no app.
+ */
+export function aplicarDaPlanilha(colecoes: Partial<Colecoes>, patch?: Partial<ConfigPlanilha>) {
+  const e = obter();
+  const novas: Pendente[] = [];
+  const agora = new Date().toISOString();
+  const saida: Partial<Colecoes> = {};
+  for (const k of Object.keys(colecoes) as (keyof Colecoes)[]) {
+    const lista = colecoes[k] as { id: Id; em?: string }[];
+    const antes = new Map((e[k] as { id: Id }[]).map((x) => [x.id, x]));
+    const final = lista.map((x) => {
+      const a = antes.get(x.id);
+      if (a === x) return x;
+      if (a && JSON.stringify(a) === JSON.stringify(x)) return a;
+      novas.push(pendencia(k, 'upsert', x.id));
+      return a ? x : { por: e.operadorId, em: agora, ...x };
+    });
+    if (final.some((x, i) => x !== (e[k] as unknown[])[i]) || final.length !== (e[k] as unknown[]).length) (saida as Record<string, unknown>)[k] = final;
+  }
+  if (!novas.length && !patch && !Object.keys(saida).length) return;
+  definir({
+    ...e, ...saida,
+    pendentes: novas.length ? [...e.pendentes, ...novas] : e.pendentes,
+    planilha: patch ? { ...(e.planilha ?? configPlanilhaPadrao()), ...patch } : e.planilha,
+  });
 }
 
 export const URL_SYNC = process.env.NEXT_PUBLIC_DRAP_SYNC_URL ?? '';

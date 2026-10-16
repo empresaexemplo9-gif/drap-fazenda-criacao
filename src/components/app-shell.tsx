@@ -4,6 +4,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { Loader2 } from 'lucide-react';
 import { Header } from './header';
 import { BoasVindas } from './boas-vindas';
+import { PlanilhaAuto } from './planilha-auto';
 import { useEstado } from '@/lib/store';
 
 /**
@@ -30,6 +31,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <>
       <Header />
+      <PlanilhaAuto />
       <main className="mx-auto max-w-wide px-4 pb-24 pt-8 sm:px-8 sm:pt-12">{children}</main>
       <footer className="mx-auto flex max-w-wide flex-col items-center justify-between gap-3 border-t border-rule px-4 pb-10 pt-6 text-[11px] uppercase tracking-wide2 text-muted sm:flex-row sm:px-8">
         <span>DRAP Pecuária · funciona sem sinal</span>

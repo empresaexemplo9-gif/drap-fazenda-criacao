@@ -27,5 +27,6 @@ export const ROTAS: Rota[] = [
   { href: '/leite/', label: 'Leite', modulo: 'leite', grupo: 'Módulos', topo: true, blurb: 'Produção por vaca, CCS/CBT, mastite, reprodução e custo do litro.' },
   { href: '/genetica/', label: 'Genética', modulo: 'genetica', grupo: 'Módulos', topo: true, blurb: 'Genealogia, DEPs, acasalamento, IATF, botijão e catálogo de venda.' },
   { href: '/feira/', label: 'Feira', modulo: 'core', grupo: 'Sistema', blurb: 'Questionário do stand e lista de interessados para o piloto.' },
+  { href: '/planilha/', label: 'Planilha', modulo: 'core', grupo: 'Sistema', blurb: 'Google Planilhas ou Excel preenchendo o DRAP, e o DRAP preenchendo a planilha.' },
   { href: '/config/', label: 'Configurações', modulo: 'core', grupo: 'Sistema', blurb: 'Fazenda, módulos contratados, backup e sincronização.' },
 ];

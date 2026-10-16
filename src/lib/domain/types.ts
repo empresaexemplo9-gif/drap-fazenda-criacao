@@ -502,4 +502,41 @@ export interface Estado extends Colecoes {
   operadorId?: Id;
   pendentes: Pendente[];
   ultimaSincronizacao?: string;
+  /** Sincronização nos dois sentidos com uma planilha (Google Planilhas ou arquivo Excel). */
+  planilha?: ConfigPlanilha;
+}
+
+export interface RelatorioPlanilha {
+  em: string;
+  origem: 'google' | 'arquivo';
+  criadosDrap: number;
+  atualizadosDrap: number;
+  criadosPlanilha: number;
+  atualizadosPlanilha: number;
+  removidosPlanilha: number;
+  recolocados: number;
+  conflitos: number;
+  erros: { aba: string; linha: number; msg: string }[];
+  /** Falha de conexão ou de permissão (a sincronização não aconteceu). */
+  falha?: string;
+}
+
+export interface ConfigPlanilha {
+  /** URL do app da web do Google Apps Script (termina em /exec). */
+  url?: string;
+  /** Nome e endereço da planilha conectada (para mostrar e abrir). */
+  nome?: string;
+  link?: string;
+  /** Senha que só o script colado na planilha conhece. */
+  token: string;
+  abas: string[];
+  /** Quem vale quando a mesma linha mudou dos dois lados. */
+  politica: 'planilha' | 'drap';
+  automatica: boolean;
+  /** Impressão de cada linha na última sincronização, por aba (Google). */
+  base: Record<string, Record<Id, string>>;
+  /** Idem, para o arquivo Excel baixado e reenviado. */
+  baseArquivo: Record<string, Record<Id, string>>;
+  ultima?: RelatorioPlanilha;
+  historico: RelatorioPlanilha[];
 }

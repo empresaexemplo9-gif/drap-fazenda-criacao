@@ -1,7 +1,8 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { Download, Upload, RotateCcw, Eraser } from 'lucide-react';
+import Link from 'next/link';
+import { Download, Upload, RotateCcw, Eraser, FileSpreadsheet } from 'lucide-react';
 import {
   useEstado, definirFazenda, definirModulo, exportarJSON, importarJSON, restaurarDemo, comecarDoZero, sincronizar, URL_SYNC, definirParcial, refazerPerfil,
 } from '@/lib/store';
@@ -99,6 +100,7 @@ export default function ConfigPage() {
           <button className="btn btn-ghost" onClick={sync}>Sincronizar agora</button>
           <button className="btn btn-ghost" onClick={baixarBackup}><Download className="h-4 w-4" /> Baixar backup (.json)</button>
           <button className="btn btn-ghost" onClick={() => arq.current?.click()}><Upload className="h-4 w-4" /> Restaurar backup</button>
+          <Link className="btn btn-ghost" href="/planilha/"><FileSpreadsheet className="h-4 w-4" /> Sincronizar com planilha</Link>
           <input ref={arq} type="file" accept="application/json" className="hidden" onChange={(ev) => ev.target.files?.[0] && importar(ev.target.files[0])} />
         </div>
         {msg ? <p className="mt-3 text-[13px] text-leafDk">{msg}</p> : null}
