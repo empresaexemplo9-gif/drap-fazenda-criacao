@@ -35,7 +35,7 @@ export default function FeiraPage() {
   const [aba, setAba] = useState<'questionario' | 'lista' | 'resumo'>('questionario');
   return (
     <>
-      <PageHeader eyebrow="XVI · Validação na feira" title={<>A feira como <Em>laboratório</Em></>}
+      <PageHeader eyebrow="Validação na feira" title={<>A feira como <Em>laboratório</Em></>}
         sub="Cinco perguntas no stand, lista de interessados por tipo de operação e quem aceita ser pecuarista-piloto. Funciona sem sinal e exporta CSV." />
       <Tabs ativa={aba} onChange={setAba} abas={[{ id: 'questionario', label: 'Questionário' }, { id: 'lista', label: 'Interessados', badge: e.interessados.length || undefined }, { id: 'resumo', label: 'Resumo' }]} />
       {aba === 'questionario' && <Questionario onSalvo={() => undefined} />}
@@ -59,8 +59,8 @@ function Questionario({ onSalvo }: { onSalvo: () => void }) {
   }
   const chip = (on: boolean) => cx('rounded-full border px-3 py-1.5 text-[13.5px] font-medium', on ? 'border-leaf bg-leafLt text-leafDk' : 'border-rule text-muted hover:text-ink');
   return (
-    <div className="mx-auto max-w-2xl space-y-5">
-      {ok ? <div className="flex items-center gap-2 rounded-sm bg-leafLt px-4 py-3 text-[14px] text-leafDk"><CheckCircle2 className="h-5 w-5" /> Obrigado! Resposta guardada.</div> : null}
+    <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-2">
+      {ok ? <div className="col-span-full flex items-center gap-2 rounded-md bg-leafLt px-4 py-3 text-[14px] text-leafDk"><CheckCircle2 className="h-5 w-5" /> Obrigado! Resposta guardada.</div> : null}
       <Card eyebrow="1 · O que mais dói hoje na gestão?" title="Escolha a principal">
         <div className="flex flex-wrap gap-2">{DORES.map((d) => <button key={d} type="button" className={chip(f.maiorDor === d)} onClick={() => setF({ ...f, maiorDor: d })}>{d}</button>)}</div>
       </Card>

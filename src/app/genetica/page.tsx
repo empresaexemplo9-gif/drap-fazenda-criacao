@@ -26,7 +26,7 @@ export default function GeneticaPage() {
   if (!moduloAtivo(e.modulos, 'genetica')) return <Empty>Módulo Genética não contratado. Ative em <Link href="/config/" className="text-earth underline">Configurações</Link>.</Empty>;
   return (
     <>
-      <PageHeader eyebrow="XV · Módulo Genética" title={<>Seleção que <Em>se prova no papel</Em></>}
+      <PageHeader eyebrow="Módulo Genética" title={<>Seleção que <Em>se prova no papel</Em></>}
         sub="Registro genealógico, DEPs interpretadas, acasalamento com controle de consanguinidade, IATF/FIV/TE com taxa de prenhez, botijão e catálogo de venda com histórico verificável." />
       <Tabs<Aba> ativa={aba} onChange={setAba} abas={[
         { id: 'plantel', label: 'Plantel e DEPs' }, { id: 'acasalamento', label: 'Acasalamento' }, { id: 'reproducao', label: 'IATF · FIV · TE' },
@@ -287,7 +287,7 @@ function Catalogo() {
               actions={an.publicado ? <Badge tone="leaf">publicado</Badge> : <Badge>rascunho</Badge>}>
               <p className="text-[13px] text-muted">{a?.raca} · {a?.registroGenealogico} · nasc. {a ? isoToBrDate(a.nascimento) : ''}</p>
               <p className="mt-1 text-[13px]">Pai: <strong>{pai?.nome ?? a?.paiExterno ?? '—'}</strong> · Mãe: <strong>{mae?.nome ?? '—'}</strong></p>
-              {av ? <div className="mt-3 flex flex-wrap gap-2">{['P210', 'P450', 'PE', 'AOL', 'MGT'].map((k) => av.deps[k] != null ? <span key={k} className="num rounded-sm bg-leafLt/60 px-2 py-0.5 text-[12px]">{k} {num(av.deps[k])}</span> : null)}{av.top ? <Badge tone="leaf">TOP {av.top}%</Badge> : null}</div> : null}
+              {av ? <div className="mt-3 flex flex-wrap gap-2">{['P210', 'P450', 'PE', 'AOL', 'MGT'].map((k) => av.deps[k] != null ? <span key={k} className="num rounded-md bg-leafLt/60 px-2 py-0.5 text-[12px]">{k} {num(av.deps[k])}</span> : null)}{av.top ? <Badge tone="leaf">TOP {av.top}%</Badge> : null}</div> : null}
               {an.preco ? <p className="num mt-4 text-2xl font-semibold">{brl(an.preco)}</p> : null}
               <div className="mt-4 flex flex-wrap gap-3 text-[12px]">
                 <Link href={`/animal/?id=${an.animalId}`} className="inline-flex items-center gap-1 font-medium text-earth hover:text-ink">Ficha com histórico verificável <ExternalLink className="h-3 w-3" /></Link>

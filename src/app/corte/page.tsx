@@ -31,7 +31,7 @@ export default function CortePage() {
   if (!moduloAtivo(e.modulos, 'corte')) return <Empty>Módulo Corte não contratado. Ative em <Link href="/config/" className="text-earth underline">Configurações</Link>.</Empty>;
   return (
     <>
-      <PageHeader eyebrow="XIII · Módulo Corte" title={<>Do bezerro <Em>ao gancho</Em></>}
+      <PageHeader eyebrow="Módulo Corte" title={<>Do bezerro <Em>ao gancho</Em></>}
         sub="Ganho de peso com histórico usável, confinamento por cocho, reposição comparada por fornecedor, venda por frigorífico e os indicadores que dizem se a fazenda está dando lucro." />
       <Tabs<Aba> ativa={aba} onChange={setAba} abas={[
         { id: 'desempenho', label: 'Ganho de peso' }, { id: 'confinamento', label: 'Confinamento' }, { id: 'reposicao', label: 'Reposição' },
@@ -305,7 +305,7 @@ function NovaVenda({ onFechar }: { onFechar: () => void }) {
       </div>
       <datalist id="frigs">{[...new Set(e.vendas.map((v) => v.frigorifico))].map((x) => <option key={x} value={x} />)}</datalist>
       {carencia.size && bichos.some((a) => carencia.has(a.id)) ? <p className="mt-4 text-[12.5px] text-warn">{bichos.filter((a) => carencia.has(a.id)).length} animal(is) em carência ficaram fora da venda.</p> : null}
-      <div className="mt-5 grid grid-cols-3 gap-3 rounded-sm bg-paper/70 px-4 py-3 text-[13px]">
+      <div className="mt-5 grid grid-cols-3 gap-3 rounded-md bg-paper/70 px-4 py-3 text-[13px]">
         <div><div className="eyebrow text-muted">Peso vivo</div><div className="num">{num(pv, 0)} kg</div></div>
         <div><div className="eyebrow text-muted">@ de carcaça</div><div className="num">{num(pc / KG_POR_ARROBA, 1)}</div></div>
         <div><div className="eyebrow text-muted">Valor bruto</div><div className="num font-semibold">{brl(valor)}</div></div>

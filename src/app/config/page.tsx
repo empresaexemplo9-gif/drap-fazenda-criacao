@@ -33,8 +33,8 @@ export default function ConfigPage() {
   }
 
   return (
-    <div className="mx-auto max-w-reading">
-      <PageHeader eyebrow="XVII · Configurações" title={<>Sua fazenda, <Em>seus módulos</Em></>} sub="Núcleo obrigatório e módulos plugáveis com preço próprio. Backup, restauração e sincronização." />
+    <div>
+      <PageHeader eyebrow="Configurações" title={<>Sua fazenda, <Em>seus módulos</Em></>} sub="Núcleo obrigatório e módulos plugáveis com preço próprio. Backup, restauração e sincronização." />
 
       <Card eyebrow="Fazenda" title="Dados gerais">
         <div className="grid grid-cols-2 gap-5 sm:grid-cols-3">
@@ -57,7 +57,7 @@ export default function ConfigPage() {
           {MODULOS.map((m) => {
             const on = moduloAtivo(e.modulos, m.id);
             return (
-              <div key={m.id} className={cx('rounded-sm border p-4', on ? 'border-leaf/60 bg-leafLt/30' : 'border-rule/70')}>
+              <div key={m.id} className={cx('rounded-md border p-4', on ? 'border-leaf/60 bg-leafLt/30' : 'border-rule/70')}>
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <h3 className="font-display text-lg font-semibold">{m.nome}</h3>
@@ -72,7 +72,7 @@ export default function ConfigPage() {
                   )}
                 </div>
                 <p className="mt-2 text-[13px] text-muted">{m.resumo}</p>
-                <ul className="mt-2 flex flex-wrap gap-1">{m.recursos.map((r) => <li key={r} className="rounded-sm bg-paper px-1.5 py-0.5 text-[11px] text-muted">{r}</li>)}</ul>
+                <ul className="mt-2 flex flex-wrap gap-1">{m.recursos.map((r) => <li key={r} className="rounded-md bg-paper px-1.5 py-0.5 text-[11px] text-muted">{r}</li>)}</ul>
               </div>
             );
           })}

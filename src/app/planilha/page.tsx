@@ -112,7 +112,7 @@ export default function PlanilhaPage() {
 
   return (
     <>
-      <PageHeader eyebrow="XVIII · Planilha" title={<>Planilha e DRAP <Em>preenchendo um ao outro</Em></>}
+      <PageHeader eyebrow="Planilha" title={<>Planilha e DRAP <Em>preenchendo um ao outro</Em></>}
         sub="Quem já controla o rebanho numa planilha não precisa abandoná-la. O que for digitado na planilha entra no DRAP Pecuária, e o que for anotado no DRAP aparece na planilha. O mesmo animal, lote ou lançamento é reconhecido dos dois lados pelo brinco, RFID, nome, número do documento ou código."
       />
 
@@ -187,7 +187,7 @@ export default function PlanilhaPage() {
               <button className="btn btn-ghost btn-sm" onClick={() => { preparar(); setVerCodigo((v) => !v); }}>{verCodigo ? 'Esconder' : 'Ver o código'}</button>
             </div>
             {verCodigo && token ? (
-              <textarea readOnly className="mt-3 h-56 w-full rounded-sm border border-rule bg-paper p-3 font-mono text-[11px]" value={codigoAppsScript(token)} onFocus={(ev) => ev.target.select()} />
+              <textarea readOnly className="mt-3 h-56 w-full rounded-md border border-rule bg-paper p-3 font-mono text-[11px]" value={codigoAppsScript(token)} onFocus={(ev) => ev.target.select()} />
             ) : null}
             <p className="mt-2 text-[12px] text-muted">O código tem uma senha só desta fazenda. Não mande para ninguém.</p>
           </div></li>

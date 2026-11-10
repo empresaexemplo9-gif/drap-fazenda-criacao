@@ -71,7 +71,7 @@ const B = process.argv[2] || 'http://localhost:4173';
   // Feira
   await p.goto(B + '/feira/', { waitUntil: 'networkidle' });
   await p.click('text=Não sei o custo da @ ou do litro');
-  await p.click('text=Planilha');
+  await p.click('main button:text-is("Planilha")');
   await p.click('text=Até R$ 100/mês');
   await p.click('button:has-text("Corte")');
   await p.click('text=Sim, quero participar');
@@ -110,7 +110,7 @@ const B = process.argv[2] || 'http://localhost:4173';
   e = await st();
   ok(!e.modulos.corte && e.modulos.leite && !e.modulos.genetica && e.lotes.every((l) => l.atividade === 'leite'), 'perfil só leite: só lotes de leite');
   await p.goto(B + '/', { waitUntil: 'networkidle' });
-  ok(!(await p.locator('header nav a:has-text("Corte")').count()) && (await p.locator('header nav a:has-text("Leite")').count()) === 1, 'menu mostra só o módulo Leite');
+  ok(!(await p.locator('aside nav a:has-text("Corte")').count()) && (await p.locator('aside nav a:has-text("Leite")').count()) === 1, 'menu mostra só o módulo Leite');
   ok(await p.locator('text=Módulo Leite').first().isVisible() && !(await p.locator('text=Módulo Corte').count()), 'painel com cartão só do Leite');
   await p.goto(B + '/mercado/', { waitUntil: 'networkidle' });
   ok(!(await p.locator('text=Boi gordo').count()), 'mercado sem boi para quem só tira leite');

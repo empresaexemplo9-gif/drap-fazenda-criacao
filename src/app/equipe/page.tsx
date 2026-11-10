@@ -41,7 +41,7 @@ export default function EquipePage() {
 
   return (
     <>
-      <PageHeader eyebrow="XI · Equipe" title={<>O conhecimento <Em>fica na fazenda</Em></>}
+      <PageHeader eyebrow="Equipe" title={<>O conhecimento <Em>fica na fazenda</Em></>}
         sub="Cada pesagem, vacina e ordenha leva o nome de quem anotou. Quando o vaqueiro sai, o histórico continua."
         actions={<button className="btn btn-primary" onClick={() => setEdit({ id: novoId('p'), nome: '', funcao: 'vaqueiro', ativo: true })}><Plus className="h-4 w-4" /> Pessoa</button>} />
 

@@ -74,7 +74,7 @@ function Ficha({ animalId }: { animalId: string }) {
   }, [ordenhas]);
 
   return (
-    <div className="mx-auto max-w-reading">
+    <div>
       <Link href="/rebanho/" className="no-print mb-4 inline-flex items-center gap-1 text-[13px] text-muted hover:text-ink"><ArrowLeft className="h-4 w-4" /> Rebanho</Link>
       <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>

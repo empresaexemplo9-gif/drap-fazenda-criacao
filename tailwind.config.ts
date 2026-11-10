@@ -8,16 +8,16 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        paper:  '#F7F4EC',
-        bone:   '#FBFAF5',
-        ink:    '#111410',
+        paper:  '#F3F1EA',
+        bone:   '#FFFFFF',
+        ink:    '#151A14',
         muted:  '#5A5A54',
         leaf:   '#486B3A',
         leafDk: '#2F4A27',
         leafLt: '#DFE7D6',
         earth:  '#7A5C3B',
         earthLt:'#EADFCE',
-        rule:   '#C8C2B2',
+        rule:   '#D9D3C5',
         warn:   '#9A6B12',
         warnLt: '#F4E7C8',
         alert:  '#A4372A',
@@ -32,7 +32,7 @@ const config: Config = {
         wide2: '0.14em',
       },
       boxShadow: {
-        card: '0 1px 0 rgba(17,20,16,0.04), 0 8px 24px -16px rgba(17,20,16,0.08)',
+        card: '0 1px 2px rgba(21,26,20,0.04), 0 12px 28px -22px rgba(21,26,20,0.18)',
       },
       maxWidth: {
         reading: '62rem',

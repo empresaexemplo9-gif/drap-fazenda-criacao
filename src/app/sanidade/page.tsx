@@ -32,7 +32,7 @@ export default function SanidadePage() {
 
   return (
     <>
-      <PageHeader eyebrow="IV · Sanidade" title={<>Calendário sanitário <Em>e carência</Em> sob controle</>}
+      <PageHeader eyebrow="Sanidade" title={<>Calendário sanitário <Em>e carência</Em> sob controle</>}
         sub="Vacinas obrigatórias, vermifugação, carrapato e antibiótico com a partida do frasco: rastreável para o frigorífico e para a defesa sanitária."
         actions={<button className="btn btn-primary" onClick={() => setNova(true)}><Plus className="h-4 w-4" /> Aplicação por lote</button>} />
 
@@ -139,7 +139,7 @@ export default function SanidadePage() {
             {rastreio.map((s) => (
               <div key={s.id} className="mb-4">
                 <p className="text-[13px]"><strong>{s.produto}</strong> · partida <span className="num">{s.partida}</span> · {isoToBrDate(s.data)} · <span className="num">{s.animalIds.length}</span> animais</p>
-                <p className="mt-1 flex flex-wrap gap-1.5">{s.animalIds.slice(0, 200).map((id) => <Link key={id} href={`/animal/?id=${id}`} className="num rounded-sm bg-earthLt/60 px-1.5 py-0.5 text-[11.5px] hover:bg-leafLt">{ix.animal.get(id)?.brinco ?? '?'}</Link>)}</p>
+                <p className="mt-1 flex flex-wrap gap-1.5">{s.animalIds.slice(0, 200).map((id) => <Link key={id} href={`/animal/?id=${id}`} className="num rounded-md bg-earthLt/60 px-1.5 py-0.5 text-[11.5px] hover:bg-leafLt">{ix.animal.get(id)?.brinco ?? '?'}</Link>)}</p>
               </div>
             ))}
           </div>

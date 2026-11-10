@@ -6,12 +6,25 @@
  * terra para saídas, tinta para o saldo.
  */
 
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
+
+/** Largura real do contêiner: o gráfico ocupa a largura toda sem ampliar texto e traço. */
+function useLargura(padrao = 640): [(el: HTMLDivElement | null) => void, number] {
+  const [w, setW] = useState(padrao);
+  const obs = useRef<ResizeObserver | null>(null);
+  const ref = useCallback((el: HTMLDivElement | null) => {
+    obs.current?.disconnect();
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    obs.current = new ResizeObserver(([r]) => { const n = Math.round(r.contentRect.width); if (n > 0) setW(n); });
+    obs.current.observe(el);
+  }, []);
+  return [ref, w];
+}
 
 const LEAF = '#486B3A';
 const EARTH = '#7A5C3B';
-const INK = '#111410';
-const RULE = '#C8C2B2';
+const INK = '#151A14';
+const RULE = '#D9D3C5';
 const MUTED = '#5A5A54';
 
 function escala(min: number, max: number, a: number, b: number) {
@@ -33,7 +46,7 @@ export function BarrasFluxo({ dados, legendaA = 'Entradas', legendaB = 'Saídas'
   dados: PontoBarras[]; legendaA?: string; legendaB?: string; legendaLinha?: string; altura?: number; formatar?: (v: number) => string;
 }) {
   const [hover, setHover] = useState<number | null>(null);
-  const W = 640;
+  const [box, W] = useLargura();
   const H = altura;
   const pad = { l: 8, r: 8, t: 16, b: 28 };
   const valores = dados.flatMap((d) => [d.a, d.b, d.linha ?? 0, 0]);
@@ -41,12 +54,12 @@ export function BarrasFluxo({ dados, legendaA = 'Entradas', legendaB = 'Saídas'
   const min = Math.min(...valores);
   const y = escala(min, max, H - pad.b, pad.t);
   const slot = (W - pad.l - pad.r) / Math.max(1, dados.length);
-  const bw = Math.min(16, slot * 0.3);
+  const bw = Math.min(22, slot * 0.3);
   const linha = dados.map((d, i) => d.linha == null ? null : `${pad.l + slot * i + slot / 2},${y(d.linha)}`).filter(Boolean).join(' ');
   const h = hover != null ? dados[hover] : null;
   return (
     <figure>
-      <div className="relative">
+      <div className="relative" ref={box}>
         <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full" role="img" aria-label="Gráfico de fluxo">
           <line x1={pad.l} x2={W - pad.r} y1={y(0)} y2={y(0)} stroke={RULE} />
           {dados.map((d, i) => {
@@ -66,7 +79,7 @@ export function BarrasFluxo({ dados, legendaA = 'Entradas', legendaB = 'Saídas'
           ))}
         </svg>
         {h ? (
-          <div className="pointer-events-none absolute right-2 top-0 rounded-sm border border-rule bg-bone px-3 py-2 text-[12px] shadow-card">
+          <div className="pointer-events-none absolute right-2 top-0 rounded-xl border border-rule bg-bone px-3 py-2 text-[12px] shadow-card">
             <div className="eyebrow mb-1">{h.rotulo}{h.destaque ? ' · projetado' : ''}</div>
             <div className="num text-leafDk">{legendaA}: {formatar(h.a)}</div>
             <div className="num text-earth">{legendaB}: {formatar(h.b)}</div>
@@ -75,8 +88,8 @@ export function BarrasFluxo({ dados, legendaA = 'Entradas', legendaB = 'Saídas'
         ) : null}
       </div>
       <figcaption className="mt-2 flex flex-wrap gap-4 text-[11.5px] text-muted">
-        <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm" style={{ background: LEAF }} />{legendaA}</span>
-        <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-sm" style={{ background: EARTH }} />{legendaB}</span>
+        <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-md" style={{ background: LEAF }} />{legendaA}</span>
+        <span className="inline-flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-md" style={{ background: EARTH }} />{legendaB}</span>
         <span className="inline-flex items-center gap-1.5"><span className="h-0.5 w-4" style={{ background: INK }} />{legendaLinha}</span>
       </figcaption>
     </figure>
@@ -91,8 +104,8 @@ export function Linha({ pontos, altura = 160, cor = LEAF, formatar = compacto, r
   desdeZero?: boolean;
 }) {
   const [hover, setHover] = useState<number | null>(null);
+  const [box, W] = useLargura();
   if (pontos.length === 0) return <p className="py-6 text-center text-[13px] italic text-muted">Sem dados para o gráfico.</p>;
-  const W = 640;
   const H = altura;
   const pad = { l: 8, r: 8, t: 14, b: 24 };
   const ys = pontos.map((p) => p.y).concat(referencia ? [referencia.y] : [], desdeZero ? [0] : []);
@@ -104,7 +117,7 @@ export function Linha({ pontos, altura = 160, cor = LEAF, formatar = compacto, r
   const d = pontos.map((p, i) => `${i ? 'L' : 'M'}${x(i)},${y(p.y)}`).join(' ');
   const passo = Math.max(1, Math.ceil(pontos.length / 8));
   return (
-    <div className="relative">
+    <div className="relative" ref={box}>
       <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full" role="img" aria-label="Gráfico de linha"
         onMouseLeave={() => setHover(null)}
         onMouseMove={(ev) => {
@@ -127,7 +140,7 @@ export function Linha({ pontos, altura = 160, cor = LEAF, formatar = compacto, r
         {hover != null ? <circle cx={x(hover)} cy={y(pontos[hover].y)} r={4} fill={cor} /> : null}
       </svg>
       {hover != null ? (
-        <div className="pointer-events-none absolute right-2 top-0 rounded-sm border border-rule bg-bone px-3 py-1.5 text-[12px] shadow-card">
+        <div className="pointer-events-none absolute right-2 top-0 rounded-xl border border-rule bg-bone px-3 py-1.5 text-[12px] shadow-card">
           <span className="text-muted">{rotuloX ? rotuloX(pontos[hover].x, hover) : pontos[hover].x}: </span>
           <span className="num font-semibold">{formatar(pontos[hover].y)}</span>
         </div>

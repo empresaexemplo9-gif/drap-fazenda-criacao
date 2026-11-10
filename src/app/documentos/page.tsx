@@ -28,7 +28,7 @@ export default function DocumentosPage() {
 
   return (
     <>
-      <PageHeader eyebrow="X · Documentação e conformidade" title={<>Papel em dia, <Em>origem comprovada</Em></>}
+      <PageHeader eyebrow="Documentação e conformidade" title={<>Papel em dia, <Em>origem comprovada</Em></>}
         sub="GTA, nota do produtor, Funrural, CAR, ITR e CCIR com vencimento no calendário. Rastreabilidade para frigorífico, exportação e a exigência de origem livre de desmatamento."
         actions={<button className="btn btn-primary" onClick={() => setEdit(novo())}><Plus className="h-4 w-4" /> Documento</button>} />
 

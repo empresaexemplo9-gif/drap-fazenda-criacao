@@ -40,7 +40,7 @@ export default function CustosPage() {
 
   return (
     <>
-      <PageHeader eyebrow="VIII · Custo de produção" title={<>Quanto <Em>custou {oQue}</Em></>}
+      <PageHeader eyebrow="Custo de produção" title={<>Quanto <Em>custou {oQue}</Em></>}
         sub="Custo direto do lote mais o rateio de mão de obra, combustível, energia, depreciação e reforma de pasto, só entre as atividades que a fazenda pratica. O produtor sabe o que vendeu; aqui ele vê quanto custou."
       />
 

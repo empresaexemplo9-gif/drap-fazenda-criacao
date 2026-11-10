@@ -56,7 +56,7 @@ export default function LancamentosPage() {
 
   return (
     <>
-      <PageHeader eyebrow="VI · Livro-razão" title={<>Cada real <Em>com débito e crédito</Em></>}
+      <PageHeader eyebrow="Livro-razão" title={<>Cada real <Em>com débito e crédito</Em></>}
         sub="O mesmo método do DRAP Fazenda: plano de contas em três níveis, fornecedor, NF e vencimento. Cada lançamento leva a atividade e o lote para virar custo de produção."
         actions={<>
           <button className="btn btn-ghost" onClick={exportarCSV}><Download className="h-4 w-4" /> CSV contábil</button>

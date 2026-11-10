@@ -49,7 +49,7 @@ export default function PastagensPage() {
 
   return (
     <>
-      <PageHeader eyebrow="III · Pastagens" title={<>O pasto <Em>ligado ao ganho</Em> do animal</>}
+      <PageHeader eyebrow="Pastagens" title={<>O pasto <Em>ligado ao ganho</Em> do animal</>}
         sub="Lotação em UA/ha contra a capacidade de suporte, rotação com descanso mínimo e o GMD de quem está em cada piquete."
         actions={<button className="btn btn-primary" onClick={() => setEdit({ id: novoId('pq'), nome: '', areaHa: 0, forrageira: 'Brachiaria brizantha (Marandu)', capacidadeUAha: 2, status: 'descanso', desde: hoje, diasDescansoAlvo: 30 })}><Plus className="h-4 w-4" /> Piquete</button>} />
 

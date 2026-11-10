@@ -47,10 +47,10 @@ export default function AgendaPage() {
 
   return (
     <>
-      <PageHeader eyebrow="V · Agenda" title={<>O calendário <Em>da fazenda inteira</Em></>}
+      <PageHeader eyebrow="Agenda" title={<>O calendário <Em>da fazenda inteira</Em></>}
         sub="Vacinas, partos, secagens, pagamentos, GTA e ITR no mesmo calendário. As sugestões vêm do rebanho; agende para virarem tarefa." />
 
-      <div className="mb-6 flex flex-wrap items-center gap-2 rounded-sm border border-rule bg-bone p-3">
+      <div className="mb-6 flex flex-wrap items-center gap-2 rounded-md border border-rule bg-bone p-3">
         <input className="field-input min-w-0 flex-1 py-1.5" placeholder="Novo lembrete…" value={novo.titulo}
           onChange={(ev) => setNovo({ ...novo, titulo: ev.target.value })} onKeyDown={(ev) => { if (ev.key === 'Enter') adicionar(); }} aria-label="Título do lembrete" />
         <input type="date" className="field-input w-auto py-1.5" value={novo.data} onChange={(ev) => setNovo({ ...novo, data: ev.target.value })} aria-label="Data" />
@@ -69,14 +69,14 @@ export default function AgendaPage() {
       </div>
 
       {aba === 'lista' && (
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+        <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-2">
           <Card eyebrow={atras.length ? `${atras.length} em atraso` : 'Pendentes'} title="Tarefas agendadas" tone={atras.length ? 'alert' : undefined}>
             {pendentes.length === 0 ? <Empty>Nada pendente.</Empty> : (
               <ul className="space-y-1.5">
                 {pendentes.map((ev) => {
                   const atrasado = ev.data < hoje;
                   return (
-                    <li key={ev.id} className="flex items-center gap-3 rounded-sm border border-rule/60 bg-white/50 px-3 py-2">
+                    <li key={ev.id} className="flex items-center gap-3 rounded-md border border-rule/60 bg-white/50 px-3 py-2">
                       <button onClick={() => atualizar('eventos', ev.id, { concluido: true })} title="Concluir" aria-label={`Concluir ${ev.titulo}`}
                         className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded border border-ink/30 text-transparent transition-colors hover:border-leafDk hover:text-leafDk"><Check size={12} /></button>
                       <span className={cx('num w-11 flex-shrink-0 text-xs', atrasado ? 'font-semibold text-alert' : 'text-muted')}>{isoToBrShort(ev.data)}</span>
@@ -93,7 +93,7 @@ export default function AgendaPage() {
                 <summary className="cursor-pointer">Concluídos ({feitos.length})</summary>
                 <ul className="mt-2 space-y-1">
                   {feitos.map((ev) => (
-                    <li key={ev.id} className="flex items-center gap-3 rounded-sm px-3 py-1.5 line-through">
+                    <li key={ev.id} className="flex items-center gap-3 rounded-md px-3 py-1.5 line-through">
                       <button onClick={() => atualizar('eventos', ev.id, { concluido: false })} title="Reabrir" className="flex h-5 w-5 items-center justify-center rounded border border-leafDk bg-leafLt text-leafDk"><Check size={12} /></button>
                       <span className="num text-xs">{isoToBrShort(ev.data)}</span>
                       <span className="min-w-0 flex-1 truncate">{ev.titulo}</span>
@@ -131,9 +131,9 @@ export default function AgendaPage() {
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
           <Card className="lg:col-span-2" pad={false}>
             <div className="flex items-center justify-between border-b border-rule/60 px-5 py-3">
-              <button className="inline-flex h-8 w-8 items-center justify-center rounded-sm hover:bg-rule/40" onClick={() => setMes(mesDe(addMeses(`${mes}-01`, -1)))} aria-label="Mês anterior"><ChevronLeft className="h-4 w-4" /></button>
+              <button className="inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-rule/40" onClick={() => setMes(mesDe(addMeses(`${mes}-01`, -1)))} aria-label="Mês anterior"><ChevronLeft className="h-4 w-4" /></button>
               <h2 className="font-display text-xl font-semibold capitalize">{rotuloMes(mes, true)}</h2>
-              <button className="inline-flex h-8 w-8 items-center justify-center rounded-sm hover:bg-rule/40" onClick={() => setMes(mesDe(addMeses(`${mes}-01`, 1)))} aria-label="Próximo mês"><ChevronRight className="h-4 w-4" /></button>
+              <button className="inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-rule/40" onClick={() => setMes(mesDe(addMeses(`${mes}-01`, 1)))} aria-label="Próximo mês"><ChevronRight className="h-4 w-4" /></button>
             </div>
             <div className="grid grid-cols-7 border-b border-rule/60 text-center">
               {['D', 'S', 'T', 'Q', 'Q', 'S', 'S'].map((d, i) => <div key={i} className="eyebrow py-2 text-muted">{d}</div>)}

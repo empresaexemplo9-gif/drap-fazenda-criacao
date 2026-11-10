@@ -69,7 +69,7 @@ export default function RebanhoPage() {
   return (
     <>
       <PageHeader
-        eyebrow="I · Rebanho"
+        eyebrow="Rebanho"
         title={<>Cada cabeça, <Em>no lote e no pasto</Em> certos</>}
         sub="Identificação individual por brinco, botton, chip ou RFID. Sai da caderneta e do WhatsApp para um lugar só."
         actions={<>
@@ -107,7 +107,7 @@ export default function RebanhoPage() {
             <Field label="Sexo"><Select value={sexoF} onChange={(ev) => setSexoF(ev.target.value as Sexo | '')} vazio="Ambos" opcoes={[{ value: 'M', label: 'Machos' }, { value: 'F', label: 'Fêmeas' }]} /></Field>
           </div>
           {sel.size > 0 ? (
-            <div className="mb-3 flex items-center justify-between rounded-sm bg-leafLt/60 px-3 py-2 text-[13px]">
+            <div className="mb-3 flex items-center justify-between rounded-md bg-leafLt/60 px-3 py-2 text-[13px]">
               <span><span className="num font-semibold">{sel.size}</span> selecionado(s)</span>
               <div className="flex gap-2">
                 <button className="btn btn-ghost btn-sm" onClick={() => setSel(new Set())}>Limpar</button>

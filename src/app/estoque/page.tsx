@@ -34,7 +34,7 @@ export default function EstoquePage() {
 
   return (
     <>
-      <PageHeader eyebrow="IX · Estoque de insumos" title={<>Sem compra <Em>em cima da hora</Em></>}
+      <PageHeader eyebrow="Estoque de insumos" title={<>Sem compra <Em>em cima da hora</Em></>}
         sub="Sal mineral, ração, remédios, sêmen e diesel com custo médio ponderado e a data em que cada item acaba no consumo atual."
         actions={<button className="btn btn-primary" onClick={() => setNovo(true)}><Plus className="h-4 w-4" /> Insumo</button>} />
 

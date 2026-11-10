@@ -27,7 +27,7 @@ export default function LeitePage() {
   if (!moduloAtivo(e.modulos, 'leite')) return <Empty>Módulo Leite não contratado. Ative em <Link href="/config/" className="text-earth underline">Configurações</Link>.</Empty>;
   return (
     <>
-      <PageHeader eyebrow="XIV · Módulo Leite" title={<>Litro por vaca, <Em>qualidade antes do fechamento</Em></>}
+      <PageHeader eyebrow="Módulo Leite" title={<>Litro por vaca, <Em>qualidade antes do fechamento</Em></>}
         sub="Produção individual, curva de lactação, CCS/CBT contra a IN 76, mastite com descarte em carência, reprodução e o custo do litro contra a tabela do laticínio." />
       <Tabs<Aba> ativa={aba} onChange={setAba} abas={[
         { id: 'producao', label: 'Produção' }, { id: 'ordenha', label: 'Lançar ordenha' }, { id: 'qualidade', label: 'Qualidade' },
@@ -130,7 +130,7 @@ function LancarOrdenha() {
         {vacas.map((v) => {
           const bloq = carLeite.has(v.id) || mast.has(v.id);
           return (
-            <label key={v.id} className={cx('rounded-sm border px-3 py-2', bloq ? 'border-alert/40 bg-alertLt/40' : ja.has(v.id) ? 'border-leaf/40 bg-leafLt/40' : 'border-rule/60 bg-white/40')}>
+            <label key={v.id} className={cx('rounded-md border px-3 py-2', bloq ? 'border-alert/40 bg-alertLt/40' : ja.has(v.id) ? 'border-leaf/40 bg-leafLt/40' : 'border-rule/60 bg-white/40')}>
               <span className="flex items-baseline justify-between text-[12px]"><span className="num font-semibold">{v.brinco}</span><span className="truncate text-muted">{v.nome}</span></span>
               <input inputMode="decimal" className="field-input num py-1 text-lg" value={vals[v.id] ?? ''} onChange={(ev) => setVals({ ...vals, [v.id]: ev.target.value })} placeholder="L" aria-label={`Litros da vaca ${v.brinco}`} />
               {bloq ? <span className="text-[10.5px] font-semibold uppercase text-alert">descartar</span> : ja.has(v.id) ? <span className="text-[10.5px] text-leafDk">já lançada</span> : null}
@@ -309,7 +309,7 @@ function Reproducao() {
         </Card>
         <Card eyebrow="Atenção" title="Vacas vazias com mais de 60 DEL">
           {vazias.length === 0 ? <Empty>Todas prenhes ou no período voluntário de espera.</Empty> : (
-            <ul className="flex flex-wrap gap-2">{vazias.map((id) => <li key={id}><Link href={`/animal/?id=${id}`} className="num rounded-sm bg-warnLt px-2 py-1 text-[12.5px] hover:bg-leafLt">{ix.animal.get(id)?.brinco} · {del(e.reproducao, id, hoje)} DEL</Link></li>)}</ul>
+            <ul className="flex flex-wrap gap-2">{vazias.map((id) => <li key={id}><Link href={`/animal/?id=${id}`} className="num rounded-md bg-warnLt px-2 py-1 text-[12.5px] hover:bg-leafLt">{ix.animal.get(id)?.brinco} · {del(e.reproducao, id, hoje)} DEL</Link></li>)}</ul>
           )}
         </Card>
       </div>

@@ -90,7 +90,7 @@ export function Terminacao({ boi }: { boi: number }) {
         <div className="grid grid-cols-3 gap-5">{inp('entrada', 'Peso de entrada (kg)')}{inp('abate', 'Peso de abate (kg)')}{inp('rendE', 'Rendimento na entrada (%)')}</div>
         <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
           {([['p', 'Pasto + mineral'], ['s', 'Semiconfinamento'], ['c', 'Confinamento']] as const).map(([k, nome]) => (
-            <div key={k} className="rounded-sm border border-rule/60 p-4">
+            <div key={k} className="rounded-md border border-rule/60 p-4">
               <div className="eyebrow mb-3">{nome}</div>
               <div className="grid grid-cols-3 gap-3">{inp(`${k}Gmd` as keyof typeof f, 'GMD')}{inp(`${k}Custo` as keyof typeof f, 'R$/dia')}{inp(`${k}Rend` as keyof typeof f, 'Rend. %')}</div>
             </div>

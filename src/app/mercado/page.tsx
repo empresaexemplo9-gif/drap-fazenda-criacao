@@ -27,7 +27,7 @@ export default function MercadoPage() {
 
   return (
     <>
-      <PageHeader eyebrow="XII · Mercado" title={<>O preço que <Em tom="earth">mexe com a sua conta</Em></>}
+      <PageHeader eyebrow="Mercado" title={<>O preço que <Em tom="earth">mexe com a sua conta</Em></>}
         sub="Só as cotações da sua operação: boi e bezerro para corte e genética, leite para o leiteiro, milho e soja para a dieta. A decisão de vender ou segurar fica no módulo Corte." />
 
       <div className="mb-6">

@@ -149,14 +149,14 @@ export default function ManejoPage() {
   const insumosSan = e.insumos.filter((i) => ['vacina', 'medicamento'].includes(i.categoria));
 
   return (
-    <div className="mx-auto max-w-reading">
-      <PageHeader eyebrow="II · Manejo de curral" title={<>Leia o brinco, <Em>anote na hora</Em></>}
+    <div>
+      <PageHeader eyebrow="Manejo de curral" title={<>Leia o brinco, <Em>anote na hora</Em></>}
         sub="Funciona com leitor RFID em modo teclado, bastão bluetooth ou digitação do brinco. Sem sinal, tudo fica guardado no aparelho." />
 
       <div className="mb-6 grid grid-cols-3 gap-2">
         {modos.map(({ id, label, Icon }) => (
           <button key={id} type="button" onClick={() => { setModo(id); setLeituras([]); setAtual(null); setMsg(null); setAplicacaoId(null); }}
-            className={cx('card flex flex-col items-center gap-2 rounded-sm px-3 py-5 text-[15px] font-semibold transition-colors', modo === id ? 'border-leaf bg-leafLt text-leafDk' : 'text-muted hover:text-ink')}>
+            className={cx('card flex flex-col items-center gap-2 rounded-xl px-3 py-5 text-[15px] font-semibold transition-colors', modo === id ? 'border-leaf bg-leafLt text-leafDk' : 'text-muted hover:text-ink')}>
             <Icon className="h-6 w-6" strokeWidth={1.5} /> {label}
           </button>
         ))}
@@ -175,7 +175,7 @@ export default function ManejoPage() {
             <Field label="Carência leite (dias)"><Input disabled={!!aplicacaoId} inputMode="numeric" value={ap.leiteD} onChange={(ev) => setAp({ ...ap, leiteD: ev.target.value })} /></Field>
           </div>
           {aplicacaoId ? (
-            <div className="mt-4 flex items-center justify-between rounded-sm bg-leafLt/60 px-3 py-2 text-[13px]">
+            <div className="mt-4 flex items-center justify-between rounded-md bg-leafLt/60 px-3 py-2 text-[13px]">
               <span><span className="num font-semibold">{e.sanidade.find((s) => s.id === aplicacaoId)?.animalIds.length ?? 0}</span> animais nesta aplicação</span>
               <button className="btn btn-leaf btn-sm" onClick={encerrarAplicacao}>Encerrar aplicação</button>
             </div>
@@ -193,9 +193,9 @@ export default function ManejoPage() {
         <form onSubmit={ler} className="flex items-end gap-3">
           <Field label="Brinco, RFID ou SISBOV" className="flex-1">
             <div className="relative">
-              <ScanLine className="absolute left-0 top-3 h-5 w-5 text-earth" strokeWidth={1.5} />
+              <ScanLine className="absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-earth" strokeWidth={1.5} />
               <input ref={codRef} value={codigo} onChange={(ev) => setCodigo(ev.target.value)} autoComplete="off" inputMode="text"
-                className="field-input num pl-8 text-2xl" placeholder="aguardando…" aria-label="Brinco ou RFID" />
+                className="field-input num !pl-11 text-xl" placeholder="aguardando…" aria-label="Brinco ou RFID" />
             </div>
           </Field>
           <button type="submit" className="btn btn-primary">Ler</button>
@@ -203,14 +203,14 @@ export default function ManejoPage() {
         <p className="mt-2 text-[11.5px] text-muted">Dica: brincos da demo vão de 1001 a 1310. RFID no formato 982 0000…</p>
 
         {msg ? (
-          <div className={cx('mt-4 flex items-start gap-2 rounded-sm px-3 py-2 text-[13px]', msg.tom === 'erro' ? 'bg-alertLt text-alert' : msg.tom === 'aviso' ? 'bg-warnLt text-warn' : 'bg-leafLt text-leafDk')}>
+          <div className={cx('mt-4 flex items-start gap-2 rounded-md px-3 py-2 text-[13px]', msg.tom === 'erro' ? 'bg-alertLt text-alert' : msg.tom === 'aviso' ? 'bg-warnLt text-warn' : 'bg-leafLt text-leafDk')}>
             {msg.tom === 'ok' ? <CheckCircle2 className="mt-0.5 h-4 w-4" /> : <TriangleAlert className="mt-0.5 h-4 w-4" />}
             {msg.texto}
           </div>
         ) : null}
 
         {modo === 'pesagem' && atual ? (
-          <div className="mt-5 rounded-sm border border-rule bg-paper/60 p-4">
+          <div className="mt-5 rounded-md border border-rule bg-paper/60 p-4">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <Link href={`/animal/?id=${atual.id}`} className="font-display text-3xl font-semibold"><span className="num">{atual.brinco}</span> {atual.nome ? <Em>{atual.nome}</Em> : null}</Link>
               <div className="flex gap-2">

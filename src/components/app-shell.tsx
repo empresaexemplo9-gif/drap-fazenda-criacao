@@ -29,19 +29,19 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
   if (!e.perfilDefinido) return <BoasVindas />;
   return (
-    <>
+    <div className="shell-main min-h-screen lg:pl-64">
       <Header />
       <PlanilhaAuto />
-      <main className="mx-auto max-w-wide px-4 pb-24 pt-8 sm:px-8 sm:pt-12">{children}</main>
-      <footer className="mx-auto flex max-w-wide flex-col items-center justify-between gap-3 border-t border-rule px-4 pb-10 pt-6 text-[11px] uppercase tracking-wide2 text-muted sm:flex-row sm:px-8">
+      <main className="px-4 pb-16 pt-6 sm:px-6 sm:pt-8 lg:px-8 2xl:px-10">{children}</main>
+      <footer className="flex flex-col items-center justify-between gap-2 border-t border-rule/70 px-4 py-5 text-[12px] text-muted sm:flex-row sm:px-6 lg:px-8 2xl:px-10">
         <span>DRAP Pecuária · funciona sem sinal</span>
-        <span className="flex items-center gap-1.5 normal-case tracking-normal">
+        <span className="flex items-center gap-1.5">
           Desenvolvido por
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/drap.svg" alt="DRAP" className="h-3.5 w-auto opacity-90" />
+          <span className="num ml-2 text-earth">v0.1</span>
         </span>
-        <span className="font-mono text-earth">v0.1</span>
       </footer>
-    </>
+    </div>
   );
 }

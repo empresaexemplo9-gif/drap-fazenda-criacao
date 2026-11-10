@@ -40,11 +40,11 @@ export default function PosicaoPage() {
 
   return (
     <>
-      <PageHeader eyebrow="VII · Posição financeira" title={<>O que <Em tom="earth">pagar e receber</Em> no período</>}
+      <PageHeader eyebrow="Posição financeira" title={<>O que <Em tom="earth">pagar e receber</Em> no período</>}
         sub="Títulos em aberto do livro-razão. Atrasados entram sempre. A baixa gera o lançamento de pagamento contra o banco ou o caixa."
         actions={<button className="btn btn-ghost no-print" onClick={() => window.print()}><Printer className="h-4 w-4" /> Imprimir / PDF</button>} />
 
-      <section className="card mb-6 overflow-hidden rounded-sm">
+      <section className="card mb-6 overflow-hidden rounded-xl">
         <div className="grid grid-cols-1 lg:grid-cols-3">
           <div className="flex flex-col justify-center gap-2 border-b border-rule p-7 lg:border-b-0 lg:border-r">
             <span className="eyebrow">Líquido do período</span>
@@ -72,7 +72,7 @@ export default function PosicaoPage() {
       </div>
 
       {agrupar ? (
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+        <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-2">
           <ListaTitulos titulo="A pagar" eyebrow="Fornecedores, folha, impostos" itens={pagar} hoje={hoje} onBaixa={darBaixa} />
           <ListaTitulos titulo="A receber" eyebrow="Frigorífico, laticínio, leilão" itens={receber} hoje={hoje} onBaixa={darBaixa} />
         </div>

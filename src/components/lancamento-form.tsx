@@ -132,7 +132,7 @@ export function LancamentoForm({ aberto, onFechar, inicial }: { aberto: boolean;
         </label>
       </div>
       <datalist id="lanc-forn">{forn.map((x) => <option key={x} value={x} />)}</datalist>
-      <div className="mt-5 rounded-sm bg-paper/70 px-4 py-3 text-[12.5px]">
+      <div className="mt-5 rounded-md bg-paper/70 px-4 py-3 text-[12.5px]">
         <span className="eyebrow">Partida dobrada</span>
         <div className="num mt-1 flex flex-wrap justify-between gap-2">
           <span>D {p.debito || '—'} · {e.contas.find((c) => c.codigo === p.debito)?.nome ?? ''}</span>
