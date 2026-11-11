@@ -36,8 +36,8 @@ export function BoasVindas() {
 
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-[minmax(320px,30%)_1fr]">
-      <aside className="flex flex-col gap-10 bg-[#1B2A18] bg-[radial-gradient(120%_60%_at_0%_0%,rgba(72,107,58,0.45),transparent_70%)] relative overflow-hidden px-6 py-6 text-white sm:px-10 lg:sticky lg:top-0 lg:h-screen lg:py-10">
-        <Paisagem className="pointer-events-none absolute inset-x-0 bottom-0 hidden h-[34%] w-full lg:block" />
+      <aside className="flex flex-col gap-10 degrade-campo-v relative overflow-hidden px-6 py-6 text-white sm:px-10 lg:sticky lg:top-0 lg:h-screen lg:py-10">
+        <Paisagem ceu="claro" className="pointer-events-none absolute inset-x-0 bottom-0 hidden h-[34%] w-full lg:block" />
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/drap-pecuaria-claro.svg" alt="DRAP Pecuária" className="relative h-10 w-auto self-start" />
         <div className="relative hidden lg:my-auto lg:block lg:pb-[26vh]">

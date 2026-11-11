@@ -16,18 +16,25 @@ function Boi({ x, y, s = 1, flip = false }: { x: number; y: number; s?: number; 
 }
 
 /** Pasto ao entardecer, para painéis de fundo verde-escuro. */
-export function Paisagem({ className, ajuste = 'slice' }: { className?: string; ajuste?: 'slice' | 'meet' }) {
+export function Paisagem({ className, ajuste = 'slice', ceu = 'escuro' }: {
+  className?: string; ajuste?: 'slice' | 'meet';
+  /** 'claro' quando o fundo atrás da paisagem é o marrom claro do degradê. */
+  ceu?: 'escuro' | 'claro';
+}) {
+  const claro = ceu === 'claro';
+  const traco = claro ? '#1F3019' : '#DCE8D2';
+  const gado = claro ? '#1F3019' : '#EAF1E3';
   const postes = [12, 44, 76, 108, 140, 172, 204, 236, 268, 300, 332, 364, 396];
   const yCerca = (x: number) => 137 + Math.sin(x / 46) * 3.2;
   const arame = (dy: number) => postes.map((x, i) => `${i ? 'L' : 'M'}${x} ${(yCerca(x) + dy).toFixed(1)}`).join(' ');
   return (
     <svg viewBox="0 0 400 160" preserveAspectRatio={`xMaxYMax ${ajuste}`} className={className} aria-hidden>
-      <circle cx="296" cy="62" r="40" fill="#E9C46A" opacity="0.07" />
-      <circle cx="296" cy="62" r="24" fill="#E9C46A" opacity="0.22" />
-      <path d="M0 104C54 82 104 88 158 100S262 76 330 90s54 6 70 2V160H0Z" fill="#FFFFFF" opacity="0.05" />
-      <path d="M0 120C70 100 128 124 204 110s110-10 196 4V160H0Z" fill="#486B3A" opacity="0.5" />
+      <circle cx="296" cy="62" r="40" fill={claro ? '#FFF3D0' : '#E9C46A'} opacity={claro ? 0.35 : 0.07} />
+      <circle cx="296" cy="62" r="24" fill={claro ? '#F2C766' : '#E9C46A'} opacity={claro ? 0.85 : 0.22} />
+      <path d="M0 104C54 82 104 88 158 100S262 76 330 90s54 6 70 2V160H0Z" fill={claro ? '#486B3A' : '#FFFFFF'} opacity={claro ? 0.28 : 0.05} />
+      <path d="M0 120C70 100 128 124 204 110s110-10 196 4V160H0Z" fill="#486B3A" opacity={claro ? 0.85 : 0.5} />
       {/* cata-vento */}
-      <g stroke="#DCE8D2" strokeOpacity="0.55" strokeWidth="1.1" strokeLinecap="round" fill="none">
+      <g stroke={traco} strokeOpacity={claro ? 0.7 : 0.55} strokeWidth="1.1" strokeLinecap="round" fill="none">
         <path d="M96 68 88 116M96 68l8 48M90.5 100h11M92.3 88h7.4M90.5 100l9.2-12M101.500 100l-9.200-12" />
         <circle cx="96" cy="64" r="10" />
         <path d="M96 54v20M86 64h20M88.900 56.900l14.200 14.200M103.100 56.900 88.900 71.100M106 64l9-3v6Z" />
@@ -39,14 +46,14 @@ export function Paisagem({ className, ajuste = 'slice' }: { className?: string; 
         <ellipse cx="334" cy="92" rx="9" ry="7" />
         <ellipse cx="356" cy="92" rx="9" ry="7" />
       </g>
-      <g fill="#EAF1E3" color="#EAF1E3" opacity="0.6">
+      <g fill={gado} color={gado} opacity={claro ? 0.8 : 0.6}>
         <Boi x={176} y={99} s={0.9} />
         <Boi x={248} y={96} s={0.75} flip />
         <Boi x={212} y={103} s={0.62} />
       </g>
       <path d="M0 140C80 124 156 146 232 134s110-4 168 2V160H0Z" fill="#14200F" />
       {/* cerca de arame */}
-      <g stroke="#DCE8D2" strokeOpacity="0.5" fill="none" strokeLinecap="round">
+      <g stroke={claro ? '#E9DFC8' : traco} strokeOpacity={claro ? 0.75 : 0.5} fill="none" strokeLinecap="round">
         <path d={arame(-9)} strokeWidth="0.7" />
         <path d={arame(-5)} strokeWidth="0.7" />
         {postes.map((x) => <path key={x} d={`M${x} ${(yCerca(x) - 13).toFixed(1)}V${(yCerca(x) + 4).toFixed(1)}`} strokeWidth="2" />)}

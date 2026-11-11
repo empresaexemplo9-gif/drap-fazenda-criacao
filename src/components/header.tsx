@@ -125,9 +125,9 @@ function Marca({ fazenda }: { fazenda: string }) {
 
 function Rodape({ fazenda }: { fazenda: string }) {
   return (
-    <div className="relative border-t border-white/10 px-5 py-3.5">
-      <div className="truncate text-[13px] font-semibold text-white">{fazenda}</div>
-      <div className="mt-0.5 flex items-center justify-between text-[11px] text-white/45">
+    <div className="relative border-t border-[#1B2A18]/15 px-5 py-3.5">
+      <div className="truncate text-[13px] font-bold text-[#16210F]">{fazenda}</div>
+      <div className="mt-0.5 flex items-center justify-between text-[11px] font-medium text-[#16210F]/70">
         <span>Funciona sem sinal</span>
         <span className="num">v0.1</span>
       </div>
@@ -135,7 +135,7 @@ function Rodape({ fazenda }: { fazenda: string }) {
   );
 }
 
-const FUNDO_MENU = 'bg-[#1B2A18] bg-[radial-gradient(120%_60%_at_0%_0%,rgba(72,107,58,0.38),transparent_70%)]';
+const FUNDO_MENU = 'degrade-campo-v';
 
 export function Header() {
   const path = usePathname();

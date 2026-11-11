@@ -147,3 +147,20 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='12'%3E%3Cpath d='M0 4.500H36M0 8.500H36' stroke='%23D9D3C5'/%3E%3Cpath d='M6 1V11' stroke='%23B9A888' stroke-width='2.200' stroke-linecap='round'/%3E%3C/svg%3E");
   }
 }
+
+/* Semidegradê da marca: verde-mata predominante que se desfaz num marrom bem
+   claro (terra batida) no fim da superfície. */
+@layer components {
+  .degrade-campo-v {
+    background-color: #1B2A18;
+    background-image:
+      radial-gradient(120% 45% at 0% 0%, rgba(72,107,58,0.40), transparent 70%),
+      linear-gradient(180deg, #1B2A18 0%, #22361D 52%, #4B5133 76%, #948561 91%, #CDB893 100%);
+  }
+  .degrade-campo-h {
+    background-color: #1B2A18;
+    background-image:
+      radial-gradient(70% 120% at 0% 0%, rgba(72,107,58,0.50), transparent 70%),
+      linear-gradient(98deg, #1B2A18 0%, #22361D 40%, #4B5133 62%, #A39269 82%, #DCC9A6 100%);
+  }
+}

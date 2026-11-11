@@ -89,8 +89,8 @@ export default function Painel() {
 
   return (
     <div>
-      <section className="relative mb-4 overflow-hidden rounded-2xl bg-[#1B2A18] bg-[radial-gradient(90%_120%_at_0%_0%,rgba(72,107,58,0.55),transparent_70%)] text-white shadow-[0_18px_40px_-24px_rgba(27,42,24,0.7)]">
-        <Paisagem ajuste="meet" className="pointer-events-none absolute bottom-0 right-0 hidden aspect-[400/160] h-full max-w-none sm:block [mask-image:linear-gradient(to_right,transparent,black_30%)]" />
+      <section className="relative mb-4 overflow-hidden rounded-2xl degrade-campo-h text-white shadow-[0_18px_40px_-24px_rgba(27,42,24,0.7)]">
+        <Paisagem ajuste="meet" ceu="claro" className="pointer-events-none absolute bottom-0 right-0 hidden aspect-[400/160] h-full max-w-none sm:block [mask-image:linear-gradient(to_right,transparent,black_35%)]" />
         <div className="relative flex flex-col gap-5 px-5 py-6 sm:px-8 sm:py-8 lg:max-w-[62%]">
           <div className="min-w-0">
             <span className="eyebrow !text-[#C9DDB9]">{saudacao()} · {operador?.nome.split(' ')[0] ?? 'bem-vindo'} · {perfilDe(e.modulos)?.nome}</span>
