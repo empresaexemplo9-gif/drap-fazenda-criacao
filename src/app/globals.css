@@ -10,7 +10,10 @@
   body {
     font-family: var(--font-manrope), system-ui, sans-serif;
     color: #151A14;
-    background: #F3F1EA;
+    /* Semidegradê claro: um véu do verde da marca que se desfaz em marrom bem claro. */
+    background-color: #F3F1EA;
+    background-image: linear-gradient(155deg, #DFE9D6 0%, #EDEFE4 26%, #F4F0E6 55%, #F0E4D0 82%, #E8D6BA 100%);
+    background-attachment: fixed;
   }
   ::selection { background: #486B3A; color: #F7F4EC; }
   h1, h2, h3 { font-family: var(--font-fraunces), Georgia, serif; letter-spacing: -0.015em; }
@@ -82,7 +85,8 @@
   .btn-ghost:hover:not(:disabled) { border-color: #BDB6A5; background: #FAF9F5; }
   .btn-sm { padding: 6px 11px; font-size: 12.5px; border-radius: 7px; }
   .card {
-    background: #FFFFFF;
+    background-color: #FFFFFF;
+    background-image: linear-gradient(165deg, #FBFDF9 0%, #FFFFFF 38%, #FFFFFF 62%, #FBF6EC 100%);
     border: 1px solid #E3DED1;
     box-shadow: 0 1px 2px rgba(21,26,20,0.04), 0 12px 28px -22px rgba(21,26,20,0.18);
   }
@@ -104,7 +108,7 @@
 @media print {
   header, nav, aside, .no-print { display: none !important; }
   body { background: #fff; }
-  .card { box-shadow: none; }
+  .card { box-shadow: none; background-image: none; }
   .shell-main { padding-left: 0 !important; }
 }
 

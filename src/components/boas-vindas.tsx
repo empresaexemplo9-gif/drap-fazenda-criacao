@@ -65,7 +65,7 @@ export function BoasVindas() {
             const on = sel[m];
             return (
               <button key={m} type="button" role="checkbox" aria-checked={on} onClick={() => setSel({ ...sel, [m]: !on })}
-                className={cx('card relative flex flex-col items-start gap-3 rounded-xl p-6 text-left transition-colors', on ? '!border-leaf !bg-leafLt/50 ring-2 ring-leaf/20' : 'hover:border-leaf/40')}>
+                className={cx('card relative flex flex-col items-start gap-3 rounded-xl p-6 text-left transition-colors', on ? '!border-leaf !bg-leafLt/50 !bg-none ring-2 ring-leaf/20' : 'hover:border-leaf/40')}>
                 <span className={cx('absolute right-4 top-4 flex h-6 w-6 items-center justify-center rounded-md border', on ? 'border-leafDk bg-leafDk text-paper' : 'border-rule text-transparent')}><Check className="h-4 w-4" /></span>
                 <Icon className={cx('h-8 w-8', on ? 'text-leafDk' : 'text-earth')} strokeWidth={1.5} />
                 <span className="font-sans text-xl font-bold tracking-tight">{mod.nome.replace('Módulo ', '')}</span>

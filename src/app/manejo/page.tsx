@@ -156,7 +156,7 @@ export default function ManejoPage() {
       <div className="mb-6 grid grid-cols-3 gap-2">
         {modos.map(({ id, label, Icon }) => (
           <button key={id} type="button" onClick={() => { setModo(id); setLeituras([]); setAtual(null); setMsg(null); setAplicacaoId(null); }}
-            className={cx('card flex flex-col items-center gap-2 rounded-xl px-3 py-5 text-[15px] font-semibold transition-colors', modo === id ? 'border-leaf bg-leafLt text-leafDk' : 'text-muted hover:text-ink')}>
+            className={cx('card flex flex-col items-center gap-2 rounded-xl px-3 py-5 text-[15px] font-semibold transition-colors', modo === id ? 'border-leaf bg-leafLt !bg-none text-leafDk' : 'text-muted hover:text-ink')}>
             <Icon className="h-6 w-6" strokeWidth={1.5} /> {label}
           </button>
         ))}

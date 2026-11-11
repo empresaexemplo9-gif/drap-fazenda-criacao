@@ -64,7 +64,7 @@ export function Stat({ label, value, hint, tone, size = 'md' }: { label: string;
 
 export function StatGrid({ children, cols = 4 }: { children: ReactNode; cols?: 2 | 3 | 4 | 5 }) {
   const c = { 2: 'sm:grid-cols-2', 3: 'sm:grid-cols-3', 4: 'sm:grid-cols-2 lg:grid-cols-4', 5: 'sm:grid-cols-3 lg:grid-cols-5' }[cols];
-  return <div className={cx('card grid grid-cols-2 gap-px overflow-hidden rounded-xl !bg-rule/50', c)}>{
+  return <div className={cx('card grid grid-cols-2 gap-px overflow-hidden rounded-xl !bg-rule/50 !bg-none', c)}>{
     Array.isArray(children)
       ? children.filter(Boolean).map((ch, i) => <div key={i} className="bg-bone p-5">{ch}</div>)
       : <div className="bg-bone p-5">{children}</div>
