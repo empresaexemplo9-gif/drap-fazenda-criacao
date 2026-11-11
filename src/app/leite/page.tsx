@@ -18,6 +18,7 @@ import type { CasoMastite, Ordenha } from '@/lib/domain/types';
 import { NovoEventoRepro } from '@/components/repro-form';
 import { PageHeader, Em, Card, Tabs, Tabela, Badge, Field, Input, Select, Modal, StatGrid, Stat, Aviso, Empty, cx } from '@/components/ui';
 import { Linha } from '@/components/graficos';
+import { Brinco } from '@/components/agro';
 
 type Aba = 'producao' | 'ordenha' | 'qualidade' | 'mastite' | 'reproducao' | 'bezerras' | 'rentabilidade';
 
@@ -338,7 +339,7 @@ function Bezerras() {
             const p = pesoAtual(a, hist, hoje);
             const alvo = 40 + id * 30.4 * meta;
             return (
-              <tr key={a.id}><td><Link href={`/animal/?id=${a.id}`} className="num font-semibold hover:text-leaf">{a.brinco}</Link></td><td className="r num">{num(id, 1)} m</td>
+              <tr key={a.id}><td><Link href={`/animal/?id=${a.id}`}><Brinco>{a.brinco}</Brinco></Link></td><td className="r num">{num(id, 1)} m</td>
                 <td className="r num">{Math.round(p)} kg</td><td className={cx('r num', g != null && g < meta && 'text-alert')}>{g != null ? num(g, 3) : '—'}</td>
                 <td className="r num text-muted">{Math.round(alvo)} kg</td>
                 <td>{p >= 330 && id <= 16 ? <Badge tone="leaf">apta à cobertura</Badge> : p < alvo * 0.9 ? <Badge tone="warn">abaixo da meta</Badge> : <Badge>no ritmo</Badge>}</td></tr>

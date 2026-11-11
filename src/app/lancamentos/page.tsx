@@ -83,7 +83,7 @@ export default function LancamentosPage() {
           <Field label="Até"><Input type="date" value={ate} onChange={(ev) => setAte(ev.target.value)} /></Field>
           {aba === 'diario' ? <>
             <Field label="Atividade"><Select value={ativ} onChange={(ev) => setAtiv(ev.target.value as Atividade | '')} vazio="Todas" opcoes={([...perfil.atividades, 'geral'] as Atividade[]).map((a) => ({ value: a, label: ROT_ATIVIDADE[a] }))} /></Field>
-            <Field label="Buscar"><div className="relative"><Search className="absolute left-0 top-2.5 h-4 w-4 text-muted" /><Input className="pl-6" value={busca} onChange={(ev) => setBusca(ev.target.value)} placeholder="histórico, NF, conta…" /></div></Field>
+            <Field label="Buscar"><div className="relative"><Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" /><Input className="!pl-9" value={busca} onChange={(ev) => setBusca(ev.target.value)} placeholder="histórico, NF, conta…" /></div></Field>
           </> : null}
           {aba === 'razao' ? <Field label="Conta" className="col-span-2"><Select value={conta} onChange={(ev) => setConta(ev.target.value)} opcoes={e.contas.filter((c) => nivel(c.codigo) === 3 && contaVisivel(c.codigo, e.modulos)).map((c) => ({ value: c.codigo, label: `${c.codigo} · ${c.nome}` }))} /></Field> : null}
         </div>

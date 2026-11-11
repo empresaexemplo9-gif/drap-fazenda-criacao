@@ -18,6 +18,7 @@ import type { LeituraCocho } from '@/lib/domain/types';
 import { PageHeader, Em, Card, Tabs, Tabela, Badge, Field, Input, Select, Modal, StatGrid, Stat, Aviso, Empty, cx } from '@/components/ui';
 import { BarrasH, Linha } from '@/components/graficos';
 import { VenderSegurar, Terminacao } from '@/components/simuladores-corte';
+import { Brinco } from '@/components/agro';
 
 type Aba = 'desempenho' | 'confinamento' | 'reposicao' | 'vendas' | 'decisao' | 'indicadores';
 
@@ -85,7 +86,7 @@ function Desempenho() {
         <Card className="lg:col-span-2" eyebrow={`${piores.length} abaixo de 70% do GMD do lote`} title="Animais que não respondem" tone={piores.length ? 'earth' : undefined}>
           {piores.length === 0 ? <Empty>Lote homogêneo.</Empty> : (
             <ul className="divide-y divide-rule/40 text-[13px]">
-              {piores.slice(0, 12).map((l) => <li key={l.a.id} className="flex justify-between py-1.5"><Link className="num font-semibold hover:text-leaf" href={`/animal/?id=${l.a.id}`}>{l.a.brinco}</Link><span className="num text-alert">{num(l.g, 3)} kg/d</span></li>)}
+              {piores.slice(0, 12).map((l) => <li key={l.a.id} className="flex justify-between py-1.5"><Link href={`/animal/?id=${l.a.id}`}><Brinco>{l.a.brinco}</Brinco></Link><span className="num text-alert">{num(l.g, 3)} kg/d</span></li>)}
             </ul>
           )}
           <p className="mt-3 text-[12px] text-muted">Verificar verminose, casco e dominância no cocho. Persistindo, apartar ou descartar.</p>
@@ -95,7 +96,7 @@ function Desempenho() {
         <Tabela>
           <thead><tr><th>Brinco</th><th>Raça</th><th>Origem</th><th className="r">Pesagens</th><th className="r">Último peso</th><th className="r">GMD</th></tr></thead>
           <tbody>{linhas.map((l) => (
-            <tr key={l.a.id}><td><Link href={`/animal/?id=${l.a.id}`} className="num font-semibold hover:text-leaf">{l.a.brinco}</Link></td><td className="text-muted">{l.a.raca}</td><td className="text-muted">{l.a.fornecedor ?? 'Própria'}</td>
+            <tr key={l.a.id}><td><Link href={`/animal/?id=${l.a.id}`}><Brinco>{l.a.brinco}</Brinco></Link></td><td className="text-muted">{l.a.raca}</td><td className="text-muted">{l.a.fornecedor ?? 'Própria'}</td>
               <td className="r num">{l.hist.length}</td><td className="r num">{l.hist.length ? `${l.hist[l.hist.length - 1].pesoKg} kg` : '—'}</td><td className="r num font-semibold">{l.g != null ? num(l.g, 3) : '—'}</td></tr>
           ))}</tbody>
         </Tabela>

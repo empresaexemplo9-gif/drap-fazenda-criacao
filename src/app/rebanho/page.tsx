@@ -12,6 +12,7 @@ import { ROT_ATIVIDADE, ROT_FASE, ROT_STATUS, opcoes } from '@/lib/rotulos';
 import type { Atividade, Fase, Lote, Sexo, StatusAnimal } from '@/lib/domain/types';
 import { NovoAnimal, MoverLote } from '@/components/rebanho-forms';
 import { PageHeader, Em, Card, Tabs, Tabela, Badge, Field, Input, Select, Modal, Empty, StatGrid, Stat, Aviso } from '@/components/ui';
+import { Brinco } from '@/components/agro';
 
 type Aba = 'animais' | 'lotes' | 'conciliacao';
 
@@ -98,8 +99,8 @@ export default function RebanhoPage() {
           <div className="grid grid-cols-2 gap-4 pb-4 sm:grid-cols-5">
             <Field label="Buscar" className="col-span-2">
               <div className="relative">
-                <Search className="absolute left-0 top-2.5 h-4 w-4 text-muted" />
-                <Input className="pl-6" placeholder="Brinco, RFID, nome, raça…" value={busca} onChange={(ev) => setBusca(ev.target.value)} />
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />
+                <Input className="!pl-9" placeholder="Brinco, RFID, nome, raça…" value={busca} onChange={(ev) => setBusca(ev.target.value)} />
               </div>
             </Field>
             <Field label="Lote"><Select value={loteF} onChange={(ev) => setLoteF(ev.target.value)} vazio="Todos" opcoes={lotesVisiveis.map((l) => ({ value: l.id, label: l.nome }))} /></Field>
@@ -129,7 +130,7 @@ export default function RebanhoPage() {
                   <tr key={a.id}>
                     <td><input type="checkbox" disabled={a.status !== 'ativo'} checked={sel.has(a.id)} onChange={() => toggle(a.id)} aria-label={`Selecionar ${a.brinco}`} /></td>
                     <td>
-                      <Link href={`/animal/?id=${a.id}`} className="num font-semibold text-ink hover:text-leaf">{a.brinco}</Link>
+                      <Link href={`/animal/?id=${a.id}`}><Brinco>{a.brinco}</Brinco></Link>
                       {a.nome ? <div className="text-[11.5px] text-muted">{a.nome}</div> : null}
                     </td>
                     <td>

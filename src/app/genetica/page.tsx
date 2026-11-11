@@ -13,6 +13,7 @@ import { moduloAtivo } from '@/lib/domain/modulos';
 import type { EstoqueGenetico, Evento } from '@/lib/domain/types';
 import { PageHeader, Em, Card, Tabs, Tabela, Badge, Field, Input, Select, Modal, StatGrid, Stat, Aviso, Empty, cx } from '@/components/ui';
 import { NovoEventoRepro } from '@/components/repro-form';
+import { Brinco } from '@/components/agro';
 
 type Aba = 'plantel' | 'acasalamento' | 'reproducao' | 'provas' | 'botijao' | 'catalogo' | 'registro';
 const CARACTERISTICAS: Record<string, string> = {
@@ -336,7 +337,7 @@ function Registro() {
               const prazo = addDias(a.nascimento, PRAZO);
               const vencido = prazo < hoje;
               return (
-                <tr key={a.id}><td><Link href={`/animal/?id=${a.id}`} className="num font-semibold hover:text-leaf">{a.brinco}</Link></td><td className="num">{isoToBrDate(a.nascimento)}</td>
+                <tr key={a.id}><td><Link href={`/animal/?id=${a.id}`}><Brinco>{a.brinco}</Brinco></Link></td><td className="num">{isoToBrDate(a.nascimento)}</td>
                   <td>{e.animais.find((p) => p.id === a.paiId)?.nome ?? a.paiExterno ?? '—'}</td><td>{e.animais.find((p) => p.id === a.maeId)?.nome ?? '—'}</td>
                   <td>{vencido ? <Badge tone="alert">vencido {isoToBrDate(prazo)}</Badge> : <Badge tone="warn">{isoToBrDate(prazo)}</Badge>}</td>
                   <td><button className="text-[12px] text-earth hover:text-ink" onClick={() => { const n = prompt('Número do registro (RGN/RGD):'); if (n) atualizar('animais', a.id, { registroGenealogico: n }); }}>registrar</button></td></tr>

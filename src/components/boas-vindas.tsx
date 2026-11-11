@@ -13,6 +13,7 @@ import { brl } from '@/lib/format';
 import { MODULOS, perfilDe, precoTotal, type ModuloProdutivo } from '@/lib/domain/modulos';
 import type { ModuloId } from '@/lib/domain/types';
 import { cx, Em } from './ui';
+import { Paisagem } from './agro';
 
 const ICONE: Record<ModuloProdutivo, typeof Beef> = { corte: Beef, leite: Milk, genetica: Dna };
 const PERGUNTA: Record<ModuloProdutivo, string> = {
@@ -35,10 +36,11 @@ export function BoasVindas() {
 
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-[minmax(320px,30%)_1fr]">
-      <aside className="flex flex-col justify-between gap-10 bg-[#1B2A18] bg-[radial-gradient(120%_60%_at_0%_0%,rgba(72,107,58,0.45),transparent_70%)] px-6 py-6 text-white sm:px-10 lg:sticky lg:top-0 lg:h-screen lg:py-10">
+      <aside className="flex flex-col gap-10 bg-[#1B2A18] bg-[radial-gradient(120%_60%_at_0%_0%,rgba(72,107,58,0.45),transparent_70%)] relative overflow-hidden px-6 py-6 text-white sm:px-10 lg:sticky lg:top-0 lg:h-screen lg:py-10">
+        <Paisagem className="pointer-events-none absolute inset-x-0 bottom-0 hidden h-[34%] w-full lg:block" />
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/drap-pecuaria-claro.svg" alt="DRAP Pecuária" className="h-10 w-auto self-start" />
-        <div className="hidden lg:block">
+        <img src="/drap-pecuaria-claro.svg" alt="DRAP Pecuária" className="relative h-10 w-auto self-start" />
+        <div className="relative hidden lg:my-auto lg:block lg:pb-[26vh]">
           <p className="font-display text-[34px] font-semibold leading-[1.12] tracking-tight">A fazenda inteira <span className="italic text-[#A9C596]">num lugar só</span>, mesmo sem sinal.</p>
           <ul className="mt-6 space-y-2.5 text-[14px] text-white/70">
             {['Rebanho, sanidade e pasto no mesmo cadastro', 'Livro-razão com custo real da @ e do litro', 'Funciona offline no curral e sincroniza depois'].map((t) => (
@@ -46,7 +48,6 @@ export function BoasVindas() {
             ))}
           </ul>
         </div>
-        <span className="hidden text-[12px] text-white/40 lg:block">DRAP Pecuária · v0.1</span>
       </aside>
       <main className="px-5 pb-16 pt-8 sm:px-10 sm:pt-12 lg:flex lg:flex-col lg:justify-center lg:px-14 2xl:px-20">
         <span className="eyebrow">Primeiro acesso</span>

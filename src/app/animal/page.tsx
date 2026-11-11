@@ -21,6 +21,7 @@ import type { Ocorrencia } from '@/lib/domain/types';
 import { Card, Badge, Tabela, Stat, StatGrid, Field, Input, Select, Empty, Em, Aviso, Modal } from '@/components/ui';
 import { Linha } from '@/components/graficos';
 import { NovoAnimal } from '@/components/rebanho-forms';
+import { Brinco } from '@/components/agro';
 
 export default function AnimalPage() {
   const [id, setId] = useState<string | null>(null);
@@ -80,7 +81,7 @@ function Ficha({ animalId }: { animalId: string }) {
         <div>
           <span className="eyebrow">{a.raca} · {ROTULO_CATEGORIA[cat]} · {a.sexo === 'M' ? 'Macho' : 'Fêmea'}</span>
           <h1 className="mt-2 font-display text-5xl font-semibold leading-none tracking-tight">
-            <span className="num">{a.brinco}</span>{a.nome ? <> <Em>{a.nome}</Em></> : null}
+            <Brinco grande>{a.brinco}</Brinco>{a.nome ? <> <Em>{a.nome}</Em></> : null}
           </h1>
           <div className="mt-3 flex flex-wrap gap-2">
             <Badge tone={a.status === 'ativo' ? 'leaf' : 'neutral'}>{ROT_STATUS[a.status]}</Badge>

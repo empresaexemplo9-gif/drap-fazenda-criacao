@@ -24,7 +24,8 @@ import { relacaoTroca } from '@/lib/domain/simulador';
 import { moduloAtivo, perfilDe } from '@/lib/domain/modulos';
 import { ROTAS } from '@/lib/rotas';
 import { ROT_EVENTO, TOM_EVENTO } from '@/lib/rotulos';
-import { Badge, Em, cx } from '@/components/ui';
+import { Badge, cx } from '@/components/ui';
+import { Paisagem } from '@/components/agro';
 import { ICONES } from '@/components/icones';
 
 export default function Painel() {
@@ -88,19 +89,22 @@ export default function Painel() {
 
   return (
     <div>
-      <section className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div className="min-w-0">
-          <span className="eyebrow text-earth">{saudacao()} · {operador?.nome.split(' ')[0] ?? 'bem-vindo'} · {perfilDe(e.modulos)?.nome}</span>
-          <h1 className="mt-1.5 font-display text-[30px] font-semibold leading-tight tracking-tight text-ink sm:text-4xl">
-            O que <Em tom="earth">precisa da sua atenção</Em> hoje.
-          </h1>
-          <p className="mt-2 text-[14.5px] leading-relaxed text-muted">
-            Manejo do dia, pagamentos, prazos sanitários e o panorama do rebanho num lugar só, mesmo sem sinal.
-          </p>
-        </div>
-        <div className="flex flex-shrink-0 flex-wrap gap-2">
-          <Link href="/manejo/" className="btn btn-ghost"><Scale className="h-4 w-4" strokeWidth={1.75} /> Abrir manejo</Link>
-          <Link href="/lancamentos/" className="btn btn-primary"><Plus className="h-4 w-4" strokeWidth={2} /> Lançamento</Link>
+      <section className="relative mb-4 overflow-hidden rounded-2xl bg-[#1B2A18] bg-[radial-gradient(90%_120%_at_0%_0%,rgba(72,107,58,0.55),transparent_70%)] text-white shadow-[0_18px_40px_-24px_rgba(27,42,24,0.7)]">
+        <Paisagem ajuste="meet" className="pointer-events-none absolute bottom-0 right-0 hidden aspect-[400/160] h-full max-w-none sm:block [mask-image:linear-gradient(to_right,transparent,black_30%)]" />
+        <div className="relative flex flex-col gap-5 px-5 py-6 sm:px-8 sm:py-8 lg:max-w-[62%]">
+          <div className="min-w-0">
+            <span className="eyebrow !text-[#C9DDB9]">{saudacao()} · {operador?.nome.split(' ')[0] ?? 'bem-vindo'} · {perfilDe(e.modulos)?.nome}</span>
+            <h1 className="mt-1.5 font-display text-[30px] font-semibold leading-tight tracking-tight text-white sm:text-4xl">
+              O que <span className="italic text-[#E9C46A]">precisa da sua atenção</span> hoje.
+            </h1>
+            <p className="mt-2 max-w-2xl text-[14.5px] leading-relaxed text-white/70">
+              Manejo do dia, pagamentos, prazos sanitários e o panorama do rebanho num lugar só, mesmo sem sinal.
+            </p>
+          </div>
+          <div className="flex flex-shrink-0 flex-wrap gap-2">
+            <Link href="/manejo/" className="btn border border-white/25 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20"><Scale className="h-4 w-4" strokeWidth={1.75} /> Abrir manejo</Link>
+            <Link href="/lancamentos/" className="btn bg-[#E9C46A] text-[#2A2208] shadow-sm hover:bg-[#F0D184]"><Plus className="h-4 w-4" strokeWidth={2} /> Lançamento</Link>
+          </div>
         </div>
       </section>
 
@@ -313,7 +317,7 @@ function Secao({ titulo, sub }: { titulo: string; sub?: string }) {
     <div className="mb-3 mt-8 flex items-baseline gap-3">
       <h2 className="font-sans text-[15px] font-bold tracking-tight text-ink">{titulo}</h2>
       {sub ? <span className="text-[12.5px] text-muted">{sub}</span> : null}
-      <span className="h-px flex-1 self-center bg-rule/60" aria-hidden />
+      <span className="cerca flex-1 self-center" aria-hidden />
     </div>
   );
 }

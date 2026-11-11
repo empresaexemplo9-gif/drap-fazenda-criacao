@@ -10,6 +10,7 @@ import { useEstado, definirOperador, sincronizar } from '@/lib/store';
 import { useHoje } from '@/lib/hooks';
 import { moduloAtivo } from '@/lib/domain/modulos';
 import { ICONES } from './icones';
+import { CurvasDeNivel } from './agro';
 import { cx } from './ui';
 
 function ativo(path: string, href: string) {
@@ -73,12 +74,12 @@ function Operador() {
 /** Menu de navegação (mesmo conteúdo na barra lateral fixa e na gaveta do celular). */
 function Navegacao({ rotas, path }: { rotas: Rota[]; path: string }) {
   const item = (on: boolean) => cx(
-    'group relative flex items-center gap-3 rounded-lg px-3 py-2 text-[13.5px] font-medium transition-colors',
+    'group relative flex items-center gap-3 rounded-lg px-3 py-1.5 text-[13.5px] font-medium transition-colors',
     on ? 'bg-white/[0.11] text-white' : 'text-white/65 hover:bg-white/[0.06] hover:text-white',
   );
   const marca = <span className="absolute -left-3 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-[#A9C596]" aria-hidden />;
   return (
-    <nav className="flex-1 overflow-y-auto px-3 pb-4 pt-3" aria-label="Navegação principal">
+    <nav className="relative flex-1 overflow-y-auto px-3 pb-4 pt-3" aria-label="Navegação principal">
       <Link href="/" className={item(path === '/')}>
         {path === '/' ? marca : null}
         <LayoutDashboard className="h-[18px] w-[18px] flex-shrink-0" strokeWidth={1.75} />
@@ -88,7 +89,7 @@ function Navegacao({ rotas, path }: { rotas: Rota[]; path: string }) {
         const itens = rotas.filter((r) => r.grupo === g);
         if (!itens.length) return null;
         return (
-          <div key={g} className="mt-5">
+          <div key={g} className="mt-4">
             <div className="px-3 pb-1.5 text-[10.5px] font-bold uppercase tracking-[0.12em] text-white/35">{g === 'Módulos' ? 'Seus módulos' : g}</div>
             <div className="space-y-0.5">
               {itens.map((r) => {
@@ -112,7 +113,7 @@ function Navegacao({ rotas, path }: { rotas: Rota[]; path: string }) {
 
 function Marca({ fazenda }: { fazenda: string }) {
   return (
-    <div className="flex items-center justify-between gap-2 border-b border-white/10 px-5 py-4">
+    <div className="relative flex items-center justify-between gap-2 border-b border-white/10 px-5 py-4">
       <Link href="/" aria-label="DRAP Pecuária · Painel" className="inline-flex items-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/drap-pecuaria-claro.svg" alt="DRAP Pecuária" className="h-9 w-auto" />
@@ -124,7 +125,7 @@ function Marca({ fazenda }: { fazenda: string }) {
 
 function Rodape({ fazenda }: { fazenda: string }) {
   return (
-    <div className="border-t border-white/10 px-5 py-4">
+    <div className="relative border-t border-white/10 px-5 py-3.5">
       <div className="truncate text-[13px] font-semibold text-white">{fazenda}</div>
       <div className="mt-0.5 flex items-center justify-between text-[11px] text-white/45">
         <span>Funciona sem sinal</span>
@@ -159,7 +160,8 @@ export function Header() {
   return (
     <>
       {/* Barra lateral fixa no desktop */}
-      <aside className={cx('fixed inset-y-0 left-0 z-40 hidden w-64 flex-col lg:flex', FUNDO_MENU)}>
+      <aside className={cx('fixed inset-y-0 left-0 z-40 hidden w-64 flex-col overflow-hidden lg:flex', FUNDO_MENU)}>
+        <CurvasDeNivel className="pointer-events-none absolute inset-0 h-full w-full" />
         <Marca fazenda={e.fazenda.nome} />
         <Navegacao rotas={rotas} path={path} />
         <Rodape fazenda={e.fazenda.nome} />
@@ -203,7 +205,8 @@ export function Header() {
         ? createPortal(
           <>
             <div className="fixed inset-0 z-[60] bg-ink/50 backdrop-blur-sm" onClick={() => setDrawer(false)} aria-hidden />
-            <div className={cx('fixed inset-y-0 left-0 z-[70] flex w-[84%] max-w-xs flex-col shadow-2xl', FUNDO_MENU)} role="dialog" aria-label="Menu">
+            <div className={cx('fixed inset-y-0 left-0 z-[70] flex w-[84%] max-w-xs flex-col overflow-hidden shadow-2xl', FUNDO_MENU)} role="dialog" aria-label="Menu">
+              <CurvasDeNivel className="pointer-events-none absolute inset-0 h-full w-full" />
               <div className="relative">
                 <Marca fazenda={e.fazenda.nome} />
                 <button type="button" onClick={() => setDrawer(false)} aria-label="Fechar menu"

@@ -132,7 +132,7 @@ export default function SanidadePage() {
       {aba === 'rastreio' && (
         <Card eyebrow="Recall de vacina ou medicamento" title="Quais animais receberam esta partida?">
           <Field label="Partida (lote de fabricação)">
-            <div className="relative"><Search className="absolute left-0 top-2.5 h-4 w-4 text-muted" /><Input className="pl-6" value={partida} onChange={(ev) => setPartida(ev.target.value)} placeholder="ex.: CL-2508" /></div>
+            <div className="relative"><Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" /><Input className="!pl-9" value={partida} onChange={(ev) => setPartida(ev.target.value)} placeholder="ex.: CL-2508" /></div>
           </Field>
           <div className="mt-4">
             {partida && rastreio.length === 0 ? <Empty>Nenhuma aplicação com essa partida.</Empty> : null}
