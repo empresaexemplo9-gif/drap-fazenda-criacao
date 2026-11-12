@@ -44,7 +44,7 @@ function SyncStatus() {
         title={online ? `${n} alteração(ões) guardadas no aparelho` : 'Sem sinal: tudo continua sendo salvo no aparelho'}
         className={cx('inline-flex h-9 items-center gap-2 rounded-lg border px-2.5 text-[12.5px] font-semibold transition-colors',
           online ? 'border-rule/70 bg-white text-muted hover:border-rule hover:text-ink' : 'border-warn/40 bg-warnLt/60 text-warn')}>
-        <span className={cx('h-1.5 w-1.5 rounded-full', online ? 'bg-leaf' : 'bg-warn')} aria-hidden />
+        <span className={cx('h-1.5 w-1.5 rounded-full', online ? 'anim-pulso bg-leaf text-leaf' : 'bg-warn')} aria-hidden />
         {online ? <Wifi className="h-4 w-4" strokeWidth={1.75} /> : <WifiOff className="h-4 w-4" strokeWidth={1.75} />}
         <span className="hidden sm:inline">{online ? 'Online' : 'Sem sinal'}</span>
         <span className="num hidden rounded-md bg-paper px-1.5 py-0.5 text-[11px] text-ink sm:inline">{n}</span>

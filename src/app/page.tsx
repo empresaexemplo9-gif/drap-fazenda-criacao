@@ -25,7 +25,7 @@ import { moduloAtivo, perfilDe } from '@/lib/domain/modulos';
 import { ROTAS } from '@/lib/rotas';
 import { ROT_EVENTO, TOM_EVENTO } from '@/lib/rotulos';
 import { Badge, cx } from '@/components/ui';
-import { Paisagem } from '@/components/agro';
+import { Cerca, Paisagem } from '@/components/agro';
 import { ICONES } from '@/components/icones';
 
 export default function Painel() {
@@ -291,7 +291,7 @@ export default function Painel() {
       </section>
 
       {/* ===== ATALHOS ===== */}
-      <Secao titulo="Acesso rápido" sub="Núcleo e módulos contratados" />
+      <Secao titulo="Acesso rápido" sub="Núcleo e módulos contratados" atraso={0.4} />
       <section className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr))]">
         {rotas.map(({ href, label, blurb }) => {
           const Icon = ICONES[href] ?? ListChecks;
@@ -312,12 +312,12 @@ export default function Painel() {
   );
 }
 
-function Secao({ titulo, sub }: { titulo: string; sub?: string }) {
+function Secao({ titulo, sub, atraso = 0 }: { titulo: string; sub?: string; atraso?: number }) {
   return (
     <div className="mb-3 mt-8 flex items-baseline gap-3">
       <h2 className="font-sans text-[15px] font-bold tracking-tight text-ink">{titulo}</h2>
       {sub ? <span className="text-[12.5px] text-muted">{sub}</span> : null}
-      <span className="cerca flex-1 self-center" aria-hidden />
+      <Cerca className="flex-1 self-center" atraso={atraso} />
     </div>
   );
 }
