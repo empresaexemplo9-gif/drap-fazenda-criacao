@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Fraunces, Manrope, Roboto_Mono } from 'next/font/google';
 import { AppShell } from '@/components/app-shell';
 import './globals.css';
+import { AvisoLegal } from "@/components/aviso-legal";
 
 // Mesmas fontes do DRAP Fazenda: Fraunces (títulos), Manrope (texto) e
 // Roboto Mono (números, zero sem barra para não confundir com 8).
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="pt-BR" className={`${fraunces.variable} ${manrope.variable} ${robotoMono.variable}`}>
       <body className="min-h-screen">
         <AppShell>{children}</AppShell>
+        <AvisoLegal className="pb-24" />
       </body>
     </html>
   );

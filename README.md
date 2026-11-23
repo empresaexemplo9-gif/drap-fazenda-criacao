@@ -59,3 +59,7 @@ A análise de produto (cada dor mapeada para uma funcionalidade, o que fica para
 ## Deploy
 
 É um site estático: Vercel (`next build` gera `out/`), Netlify ou qualquer CDN. O DRAP Fazenda já usa Vercel, então basta criar um projeto apontando para este repositório.
+
+## Titularidade e licença
+
+Software proprietário desenvolvido e distribuído por **DRAP INTELIGENCIA DE MERCADO LTDA** (nome fantasia DRAP SOLUCOES PERSONALIZADAS), CNPJ 64.759.314/0001-55, Goiânia/GO. Todos os direitos reservados; uso somente mediante contrato com a DRAP. Veja `LICENSE`.

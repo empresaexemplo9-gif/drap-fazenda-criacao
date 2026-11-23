@@ -29,5 +29,7 @@
     "tailwindcss": "3.4.19",
     "typescript": "5.9.3",
     "vitest": "3.2.7"
-  }
+  },
+  "license": "UNLICENSED",
+  "author": "DRAP INTELIGENCIA DE MERCADO LTDA (CNPJ 64.759.314/0001-55)"
 }
